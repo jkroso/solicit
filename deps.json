@@ -1,0 +1,22 @@
+{
+  "production": {
+    "inherit": "http://github.com/component/inherit/tarball/0.0.2",
+    "mime": "http://github.com/component/mime/tarball/0.0.1",
+    "merge": "http://github.com/yields/merge/tarball/1.0.0",
+    "emitter": "http://github.com/jkroso/emitter/tarball/0.9.0",
+    "base64-encode": "http://github.com/ForbesLindesay/base64-encode/tarball/1.0.1",
+    "xhr": "http://github.com/yields/xhr/tarball/1.0.0",
+    "type": "http://github.com/jkroso/type/tarball/1.0.2",
+    "reduce": "http://github.com/jkroso/reduce/tarball/0.1.3",
+    "methods": "http://registry.npmjs.org/methods/-/methods-0.0.1.tgz",
+    "result": "http://registry.npmjs.org/result/-/result-0.4.2.tgz",
+    "qs": "http://registry.npmjs.org/qs/-/qs-0.6.5.tgz"
+  },
+  "development": {
+    "assert": "http://github.com/jkroso/assert/tarball/0.2.1",
+    "chai": "http://registry.npmjs.org/chai/-/chai-1.7.2.tgz",
+    "serve-js": "http://registry.npmjs.org/serve-js/-/serve-js-0.4.1.tgz",
+    "mocha": "http://registry.npmjs.org/mocha/-/mocha-1.12.1.tgz",
+    "express": "http://registry.npmjs.org/express/-/express-3.4.0.tgz"
+  }
+}

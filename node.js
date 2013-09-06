@@ -1,0 +1,272 @@
+
+var Deferred = require('result/defer')
+var write = Deferred.prototype.write
+var Request = require('./common')
+var parse = require('url').parse
+var methods = require('methods')
+var Result = require('result')
+var merge = require('merge')
+var zlib = require('zlib')
+var qs = require('qs')
+
+module.exports = exports = Request
+
+/**
+ * default protocols
+ */
+
+exports.protocols = {
+	'http:': require('http').request,
+	'https:': require('https').request
+}
+
+/**
+ * generate function for each HTTP verb
+ *
+ * @param {String} method
+ * @return {Request}
+ * @api public
+ */
+
+methods.forEach(function(method){
+	var name = method == 'delete' ? 'del' : method
+	method = method.toUpperCase()
+	exports[name] = function(url){
+		if (typeof url == 'string') {
+			if (url.indexOf('http') !== 0) url = 'http://' + url
+			url = parse(url, true)
+		}
+		url.method = method
+		url.agent = false
+		if (!url.hostname) url.hostname = 'localhost'
+		return new Request(url)
+	}
+})
+
+/**
+ * translate `this._data` to a string so it can
+ * be sent in an `OutGoingMessage`. This method
+ * must be called before `.request()`
+ *
+ * @return {String}
+ * @api private
+ */
+
+Request.prototype.serializeData = function(){
+	var data = this._data
+	if (data) {
+		if (typeof data != 'string') {
+			var fn = exports.serialize[this.header['Content-Type']]
+			if (fn) data = fn(data)
+		}
+		if (typeof data == 'string' && !('Content-Length' in this.header)) {
+			this.set('Content-Length', Buffer.byteLength(data))
+		}
+		return data
+	}
+}
+
+/**
+ * create the real request
+ *
+ * @return {OutgoingMessage}
+ * @api private
+ */
+
+Request.prototype.request = function(){
+	if (this.req) return this.req
+	var url = this.options
+	var query = url.query = qs.stringify(url.query)
+	if (query) url.path = url.pathname + '?' + query
+	url.headers = this.header
+	return this.req = exports.protocols[url.protocol](url)
+}
+
+/**
+ * onNeed handler, runs the request and parses the
+ * response. onNeed is only called the first time
+ * either `.read()` or `.then()` is called.
+ *
+ * @api private
+ */
+
+Request.prototype.onNeed = function(){
+	var self = this
+	this.response().read(function(res){
+		if (res.statusType > 2) return self.error(res)
+
+		var mime = (res.headers['content-type'] || '').split(/ *; */)[0]
+		var stream = unzip(res)
+
+		// TODO: support binary
+		res.text = ''
+		stream.on('data', function(data){
+			res.text += data || ''
+		}).on('end', function(){
+			var parse = self._parser
+				? self._parser
+				: exports.parse[mime]
+			write.call(self, parse ? parse(res.text) : res.text)
+		}).on('error', onError)
+	}, onError)
+
+	function onError(e){
+		self.error(e)
+	}
+}
+
+/**
+ * get a response object
+ *
+ * @return {Result} for IncomingMessage
+ * @api private
+ */
+
+Request.prototype.response = function(){
+	if (this._res) return this._res
+	var result = this._res = new Result
+	var data = this.serializeData()
+	var url = this.options
+	var self = this
+
+	this.startTimer()
+
+	var req = this.request()
+		.on('response', onResponse)
+		.on('error', onError)
+
+	if (!this.pipedTo) req.end(data)
+
+	function onResponse(res){
+		if (isRedirect(res.statusCode)) {
+			// ensure the response is being consumed
+			// this is required for Node v0.10+
+			res.resume()
+			self.emit('redirect', res)
+
+			if (url.method != 'HEAD' && url.method != 'GET') {
+				return onError(new Error('cant redirect a ' + url.method))
+			}
+
+			if (self.redirects.length >= self._maxRedirects) {
+				return onError(sugar(res))
+			}
+
+			url = redirection(url, res.headers.location)
+			self.redirects.push(url.href)
+
+			exports.protocols[url.protocol](url)
+				.on('response', onResponse)
+				.on('error', onError)
+				.end()
+		} else {
+			self.clearTimeout()
+			self.res = sugar(res)
+			result.write(res)
+		}
+	}
+
+	function onError(e){
+		self.clearTimeout()
+		if (!self.aborted) self.error(e)
+	}
+
+	return result
+}
+
+function sugar(res){
+	res.status = res.statusCode
+	return exports.sugar(res)
+}
+
+/**
+ * Write `data` to the socket.
+ *
+ * @param {Buffer|String} data
+ * @param {String} [encoding='utf8']
+ * @return {Boolean}
+ * @api public
+ */
+
+Request.prototype.write = function(data, encoding){
+	return this.request().write(data, encoding)
+}
+
+/**
+ * send request
+ *
+ * @param {Buffer|String} [data]
+ * @param {String} [encoding]
+ * @return {this}
+ * @api public
+ */
+
+Request.prototype.end = function(data, encoding){
+	this.request().end(data, encoding)
+	return this
+}
+
+/**
+ * Pipe the request body to `stream`
+ *
+ * @param {Stream} stream
+ * @param {Object} options
+ * @return {Stream}
+ * @api public
+ */
+
+Request.prototype.pipe = function(stream, options){
+	this.response().read(function(res){
+		unzip(res).pipe(stream, options)
+	})
+	return stream
+}
+
+/**
+ * ensure `res` is unzipped
+ *
+ * @param {IncomingMessage} res
+ * @return {Stream}
+ * @api private
+ */
+
+function unzip(res){
+	return /^(deflate|gzip)$/.test(res.headers['content-encoding'])
+		? res.pipe(zlib.createUnzip())
+		: res
+}
+
+/**
+ * create full url based of a redirect header
+ *
+ * @param {Object} url
+ * @param {String} link
+ * @return {Object}
+ */
+
+function redirection(url, link){
+	// relative path
+	if (link.indexOf('://') < 0) {
+		if (link.indexOf('//') !== 0) {
+			link = '//' + url.host + link
+		}
+		link = url.protocol + link
+	}
+	link = parse(link)
+	link.method = 'GET'
+	link.agent = url.agent
+	link.headers = url.headers
+	return link
+}
+
+/**
+ * Check if we should follow the redirect `code`
+ *
+ * @param {Number} code
+ * @return {Boolean}
+ * @api private
+ */
+
+function isRedirect(code) {
+	return [301, 302, 303, 305, 307].indexOf(code) >= 0
+}
