@@ -122,13 +122,11 @@ Request.prototype.response = function(){
 	var url = this.options
 	var self = this
 
-	this.startTimer()
-
-	var req = this.request()
+	this.request()
 		.on('response', onResponse)
 		.on('error', onError)
 
-	if (!this.pipedTo) req.end(data)
+	if (!this.pipedTo) this.end(data)
 
 	function onResponse(res){
 		if (isRedirect(res.statusCode)) {
@@ -202,6 +200,7 @@ Request.prototype.write = function(data, encoding){
  */
 
 Request.prototype.end = function(data, encoding){
+	this.startTimer()
 	this.request().end(data, encoding)
 	return this
 }
