@@ -95,17 +95,11 @@ Request.prototype.onNeed = function(){
 	this.response().read(function(res){
 		if (res.statusType > 2) return self.error(res)
 
-		var mime = (res.headers['content-type'] || '').split(/ *; */)[0]
-		var stream = unzip(res)
-
-		// TODO: support binary
-		res.text = ''
-		stream.on('data', function(data){
+		res.text = '' // TODO: support binary
+		unzip(res).on('data', function(data){
 			res.text += data || ''
 		}).on('end', function(){
-			var parse = self._parser
-				? self._parser
-				: exports.parse[mime]
+			var parse = self._parser || exports.parse[res.type]
 			write.call(self, parse ? parse(res.text) : res.text)
 		}).on('error', onError)
 	}, onError)
