@@ -1,0 +1,18 @@
+{
+  "name": "solicit",
+  "version": "0.0.0",
+  "dependencies": {
+    "result-type": "1.0.0",
+    "base64-encode": "1.0.1",
+    "emitter": "http://github.com/jkroso/emitter/tarball/0.9.0",
+    "inherit": "http://github.com/nathan7/inherit/tarball/f1a75b4844",
+    "xhr": "http://github.com/yields/xhr/tarball/1.0.0",
+    "type": "http://github.com/jkroso/type/tarball/1.0.2",
+    "reduce": "http://github.com/jkroso/reduce/tarball/0.1.3",
+    "merge": "http://github.com/jkroso/merge/tarball/1.0.1",
+    "mime": "http://github.com/component/mime/tarball/0.0.1",
+    "methods": "0.0.1",
+    "result": "0.4.2",
+    "qs": "0.6.5"
+  }
+}
