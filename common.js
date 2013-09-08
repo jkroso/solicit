@@ -351,7 +351,6 @@ Request.prototype.maxRedirects = function(n){
 	return this
 }
 
-
 /**
  * add sugar to the response
  *

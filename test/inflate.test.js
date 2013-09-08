@@ -25,4 +25,19 @@ describe('zlib', function(){
 			})
 		})
 	})
+
+	describe('.response()', function(){
+		it('should receive an inflated stream', function(done){
+			get('http://localhost:3080').response().read(function(res){
+				res.header['content-length'].should.be.below(subject.length)
+				res.text = ''
+				res.on('readable', function(){
+					res.text += this.read() || ''
+				}).on('end', function(){
+					res.text.should.equal(subject)
+					done()
+				})
+			})
+		})
+	})
 })

@@ -95,7 +95,7 @@ Request.prototype.onNeed = function(){
 		if (res.statusType > 2) return self.error(res)
 
 		res.text = '' // TODO: support binary
-		unzip(res).on('data', function(data){
+		res.on('data', function(data){
 			res.text += data || ''
 		}).on('end', function(){
 			var parse = self._parser || exports.parse[res.type]
@@ -153,9 +153,16 @@ Request.prototype.response = function(){
 				.on('error', onError)
 				.end()
 		} else {
+			var stream = res
+			// inflate
+			if (/^(deflate|gzip)$/.test(res.headers['content-encoding'])) {
+				stream = res.pipe(zlib.createUnzip())
+				stream.statusCode = res.statusCode
+				stream.headers = res.headers
+			}
 			self.clearTimeout()
-			self.res = sugar(res)
-			result.write(res)
+			self.res = sugar(stream)
+			result.write(stream)
 		}
 	}
 
@@ -210,23 +217,9 @@ Request.prototype.end = function(data, encoding){
 
 Request.prototype.pipe = function(stream, options){
 	this.response().read(function(res){
-		unzip(res).pipe(stream, options)
+		res.pipe(stream, options)
 	})
 	return stream
-}
-
-/**
- * ensure `res` is unzipped
- *
- * @param {IncomingMessage} res
- * @return {Stream}
- * @api private
- */
-
-function unzip(res){
-	return /^(deflate|gzip)$/.test(res.headers['content-encoding'])
-		? res.pipe(zlib.createUnzip())
-		: res
 }
 
 /**
