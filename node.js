@@ -1,10 +1,9 @@
 
-var Deferred = require('result/defer')
-var write = Deferred.prototype.write
 var Request = require('./common')
 var parse = require('url').parse
 var methods = require('methods')
 var Result = require('result')
+var write = Result.prototype.write
 var merge = require('merge')
 var zlib = require('zlib')
 var qs = require('qs')
