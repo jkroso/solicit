@@ -1,10 +1,10 @@
 {
   "name": "solicit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "result-type": "1.0.0",
-    "base64-encode": "1.0.1",
     "emitter": "http://github.com/jkroso/emitter/tarball/0.9.0",
+    "base64-encode": "http://github.com/ForbesLindesay/base64-encode/tarball/1.0.1",
     "inherit": "http://github.com/nathan7/inherit/tarball/f1a75b4844",
     "xhr": "http://github.com/yields/xhr/tarball/1.0.0",
     "type": "http://github.com/jkroso/type/tarball/1.0.2",
