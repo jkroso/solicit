@@ -14,5 +14,12 @@
     "methods": "0.0.1",
     "result": "0.4.2",
     "qs": "0.6.5"
-  }
+  },
+  "files": [
+    "common.js",
+    "client.js",
+    "index.js",
+    "codes.js",
+    "node.js"
+  ]
 }
