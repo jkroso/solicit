@@ -64,9 +64,6 @@ function Request(options){
 		var auth = options.auth.split(':')
 		this.auth(auth[0], auth[1])
 	}
-	this.on('pipe', function(){
-		this.pipedTo = true
-	})
 }
 
 /**
@@ -86,6 +83,16 @@ Emitter(Request.prototype)
  */
 
 Request.prototype._maxRedirects = Infinity
+
+/**
+ * listen to "pipe" on all instances. We need to know
+ * if we are being piped to so we know whether or not
+ * to wait for data before sending the request
+ */
+
+Request.prototype.on('pipe', function(){
+	this.pipedTo = true
+})
 
 /**
  * Set header `field` to `val`, or multiple fields with one object.
