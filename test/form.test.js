@@ -11,7 +11,7 @@ describe('req.send(Object) as "form"', function(){
 			post('http://localhost:5000/echo')
 			.type('form')
 			.send({ name: 'tobi' })
-			.response().read(function(res){
+			.response.read(function(res){
 				res.header.should.have.property('content-type', 'application/x-www-form-urlencoded')
 				done()
 			})

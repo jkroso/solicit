@@ -1,4 +1,5 @@
 
+var lazy = require('lazy-property')
 var format = require('url').format
 var Request = require('./common')
 var set = Request.prototype.set
@@ -64,15 +65,12 @@ Request.prototype.withCredentials = function(){
 	return this
 }
 
-Request.prototype.request = function(){
-	return this.req || (this.req = getXHR())
-}
+lazy(Request.prototype, 'request', getXHR)
 
-Request.prototype.response = function(){
-	if (this._res) return this._res
-	var result = this._res = new Result
+lazy(Request.prototype, 'response', function(){
+	var result = new Result
 	var data = this.serializeData()
-	var xhr = this.request()
+	var xhr = this.request
 	var url = this.options
 	var self = this
 
@@ -108,7 +106,7 @@ Request.prototype.response = function(){
 	xhr.send(data)
 
 	return result
-}
+})
 
 /**
  * Parse the given header `str` into
@@ -168,12 +166,12 @@ Request.prototype.timeoutError = function(){
   var time = this._timeout
   var err = new Error('timeout of ' + time + 'ms exceeded')
   err.timeout = time
-  this._res.error(err)
+  this.response.error(err)
 }
 
 Request.prototype.onNeed = function(){
 	var self = this
-	this.response().read(function(res){
+	this.response.read(function(res){
 		if (res.statusType > 2) return self.error(res)
 		res.text = res.responseText
 		var parse = self._parser
@@ -192,7 +190,7 @@ Request.prototype.write = function(s){
 
 Request.prototype.end = function(s){
 	if (s != null) this.write(s)
-	this.response()
+	this.response
 	return this
 }
 

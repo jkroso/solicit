@@ -216,7 +216,7 @@ Request.prototype.startTimer = function(){
 			var err = new Error('timeout of ' + timeout + 'ms exceeded')
 			err.timeout = timeout
 			self.abort()
-			self._res.error(err)
+			self.response.error(err)
 		}, timeout)
 	}
 }
@@ -244,7 +244,7 @@ Request.prototype.clearTimeout = function(){
 Request.prototype.abort = function(){
 	if (this.aborted) return
 	this.aborted = true
-	this.req.abort()
+	this.request.abort()
 	this.clearTimeout()
 	this.emit('abort')
 	return this

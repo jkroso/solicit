@@ -1,4 +1,5 @@
 
+var lazy = require('lazy-property')
 var Request = require('./common')
 var parse = require('url').parse
 var methods = require('methods')
@@ -72,14 +73,13 @@ Request.prototype.serializeData = function(){
  * @api private
  */
 
-Request.prototype.request = function(){
-	if (this.req) return this.req
+lazy(Request.prototype, 'request', function(){
 	var url = this.options
 	var query = url.query = qs.stringify(url.query)
 	if (query) url.path = url.pathname + '?' + query
 	url.headers = this.header
-	return this.req = exports.protocols[url.protocol](url)
-}
+	return exports.protocols[url.protocol](url)
+})
 
 /**
  * onNeed handler, runs the request and parses the
@@ -91,8 +91,8 @@ Request.prototype.request = function(){
 
 Request.prototype.onNeed = function(){
 	var self = this
-	this.response().read(function(res){
-		if (res.statusType > 2) return self.error(res)
+	this.response.read(function(res){
+		if (res.statusType > 2) return onError(res)
 
 		res.text = '' // TODO: support binary
 		res.on('data', function(data){
@@ -115,14 +115,13 @@ Request.prototype.onNeed = function(){
  * @api private
  */
 
-Request.prototype.response = function(){
-	if (this._res) return this._res
-	var result = this._res = new Result
+lazy(Request.prototype, 'response', function(){
+	var result = new Result
 	var data = this.serializeData()
 	var url = this.options
 	var self = this
 
-	this.request()
+	this.request
 		.on('response', onResponse)
 		.on('error', onError)
 
@@ -170,7 +169,7 @@ Request.prototype.response = function(){
 	}
 
 	return result
-}
+})
 
 function sugar(res){
 	res.status = res.statusCode
@@ -187,7 +186,7 @@ function sugar(res){
  */
 
 Request.prototype.write = function(data, encoding){
-	return this.request().write(data, encoding)
+	return this.request.write(data, encoding)
 }
 
 /**
@@ -201,7 +200,7 @@ Request.prototype.write = function(data, encoding){
 
 Request.prototype.end = function(data, encoding){
 	this.startTimer()
-	this.request().end(data, encoding)
+	this.request.end(data, encoding)
 	return this
 }
 
@@ -215,7 +214,7 @@ Request.prototype.end = function(data, encoding){
  */
 
 Request.prototype.pipe = function(stream, options){
-	this.response().read(function(res){
+	this.response.read(function(res){
 		res.pipe(stream, options)
 	})
 	return stream

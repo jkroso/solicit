@@ -88,12 +88,11 @@ describe('request', function(){
 		})
 	})
 
-	describe('.response()', function(){
+	describe('.response', function(){
 		describe('res.charset', function(){
 			it('should be set when present', function(done){
 				get('http://localhost:5000/login')
-				.response()
-				.read(function(res){
+				.response.read(function(res){
 					assert(res.charset == 'utf-8')
 					done()
 				})
@@ -103,8 +102,7 @@ describe('request', function(){
 		describe('res.statusType', function(){
 			it('should provide the first digit', function(done){
 				get('http://localhost:5000/login')
-				.response()
-				.read(function(res){
+				.response.read(function(res){
 					assert(200 == res.status)
 					assert(2 == res.statusType)
 					done()
@@ -115,8 +113,7 @@ describe('request', function(){
 		describe('res.type', function(){
 			it('should provide the mime-type void of params', function(done){
 				get('http://localhost:5000/login')
-				.response()
-				.read(function(res){
+				.response.read(function(res){
 					res.should.have.property('type', 'text/html')
 					res.should.have.property('charset', 'utf-8')
 					done()
@@ -127,8 +124,7 @@ describe('request', function(){
 		describe('res.links', function(){
 			it('should default to undefined', function(done){
 				get('http://localhost:5000/login')
-				.response()
-				.read(function(res){
+				.response.read(function(res){
 					assert(res.links == null)
 					done()
 				})
@@ -136,8 +132,7 @@ describe('request', function(){
 
 			it('should parse the Link header field', function(done){
 				get('http://localhost:5000/links')
-				.response()
-				.read(function(res){
+				.response.read(function(res){
 					res.links.should.eql({
 						next: 'https://api.github.com/repos/visionmedia/mocha/issues?page=2'
 					})
@@ -152,8 +147,7 @@ describe('request', function(){
 			post('http://localhost:5000/echo')
 			.set('X-Foo', 'bar')
 			.set('X-Bar', 'baz')
-			.response()
-			.read(function(res){
+			.response.read(function(res){
 				assert('bar' == res.header['x-foo'])
 				assert('baz' == res.header['x-bar'])
 				done()
@@ -165,8 +159,7 @@ describe('request', function(){
 		it('should set the header fields', function(done){
 			post('http://localhost:5000/echo')
 			.set({ 'X-Foo': 'bar', 'X-Bar': 'baz' })
-			.response()
-			.read(function(res){
+			.response.read(function(res){
 				assert('bar' == res.header['x-foo'])
 				assert('baz' == res.header['x-bar'])
 				done()
@@ -178,8 +171,7 @@ describe('request', function(){
 		it('should set the Content-Type', function(done){
 			post('http://localhost:5000/echo')
 			.type('text/x-foo')
-			.response()
-			.read(function(res){
+			.response.read(function(res){
 				res.header['content-type'].should.equal('text/x-foo')
 				done()
 			})
@@ -188,8 +180,7 @@ describe('request', function(){
 		it('should map "json"', function(done){
 			post('http://localhost:5000/echo')
 			.type('json')
-			.response()
-			.read(function(res){
+			.response.read(function(res){
 				res.header['content-type'].should.equal('application/json')
 				done()
 			})
@@ -198,8 +189,7 @@ describe('request', function(){
 		it('should map "html"', function(done){
 			post('http://localhost:5000/echo')
 			.type('html')
-			.response()
-			.read(function(res){
+			.response.read(function(res){
 				res.header['content-type'].should.equal('text/html')
 				done()
 			})
@@ -326,13 +316,11 @@ describe('request', function(){
 		})
 
 		it('should not error on dates', function(done){
-			var date = new Date(0)
-
 			request
 			.del('http://localhost:5000/query')
-			.query({ at: date })
+			.query({ at: new Date(0) })
 			.read(function(res){
-				assert(String(date) == res.at)
+				assert(String(new Date(0)) == res.at)
 				done()
 			})
 		})
