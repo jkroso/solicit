@@ -3,6 +3,7 @@ var Deferred = require('result/defer')
 var Emitter = require('emitter/light')
 var base64 = require('base64-encode')
 var statusCodes = require('./codes')
+var lazy = require('lazy-property')
 var inherit = require('inherit')
 var merge = require('merge')
 var qs = require('qs')
@@ -56,7 +57,6 @@ exports.parse = {
 function Request(options){
 	this.options = options
 	this.header = {}
-	this.redirects = []
 	if (options.method != 'HEAD') {
 		this.set('Accept-Encoding', 'gzip, deflate')
 	}
@@ -93,6 +93,12 @@ Request.prototype._maxRedirects = Infinity
 Request.prototype.on('pipe', function(){
 	this.pipedTo = true
 })
+
+/**
+ * create redirects array lazily
+ */
+
+lazy(Request.prototype, 'redirects', Array)
 
 /**
  * Set header `field` to `val`, or multiple fields with one object.
