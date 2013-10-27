@@ -206,6 +206,26 @@ describe('request', function(){
 		})
 	})
 
+	describe('.accept(str)', function(){
+		it('should set the Accept header', function(done){
+			post('http://localhost:5000/echo')
+			.accept('text/x-foo')
+			.response.read(function(res){
+				res.header['accept'].should.equal('text/x-foo')
+				done()
+			})
+		})
+
+		it('should map "json"', function(done){
+			post('http://localhost:5000/echo')
+			.accept('json')
+			.response.read(function(res){
+				res.header['accept'].should.equal('application/json')
+				done()
+			})
+		})
+	})
+
 	describe('.write(str)', function(){
 		it('should write the given data', function(done){
 			var req = post('http://localhost:5000/echo')

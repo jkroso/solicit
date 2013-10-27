@@ -161,22 +161,16 @@ Request.prototype.query = function(val){
 }
 
 /**
- * Set _Content-Type_ response header passed through `mime.lookup()`
- *
- * Examples:
- *
- *   request.post('/')
- *     .type('xml')
- *     .send(xmlstring)
- *     .read(callback)
+ * Set the "Content-Type" header. Common `type`s can
+ * be set with a shorthand string:
  *
  *   request.post('/')
- *     .type('json')
+ *     .type('application/json')
  *     .send(jsonstring)
  *     .read(callback)
  *
  *   request.post('/')
- *     .type('application/json')
+ *     .type('json')
  *     .send(jsonstring)
  *     .read(callback)
  *
@@ -186,11 +180,23 @@ Request.prototype.query = function(val){
  */
 
 Request.prototype.type = function(type){
-	if (type.indexOf('/') < 0) {
-		if (type[0] == '.') type = type.slice(1)
-		type = mime[type]
-	}
-	return this.set('Content-Type', type)
+	if (type[0] == '.') type = type.slice(1)
+	return this.set('Content-Type', type in mime ? mime[type] : type)
+}
+
+/**
+ * Set the "Accept" header. As with `Request.type()`
+ * shorthand strings are allowed
+ *
+ * @param {String} type
+ * @return {this}
+ * @api public
+ * TODO: support content negotiation
+ */
+
+Request.prototype.accept = function(type){
+	if (type[0] == '.') type = type.slice(1)
+	return this.set('Accept', type in mime ? mime[type] : type)
 }
 
 /**

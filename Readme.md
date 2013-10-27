@@ -71,14 +71,13 @@ request.get('/shoes')
 
 ### Request.type(type)
 
-  Set _Content-Type_ response header passed through `mime.lookup()`
-
-  Examples:
+  Set the "Content-Type" header. Common `type`s can
+  be set with a shorthand string:
 
 ```js
 request.post('/')
-  .type('xml')
-  .send(xmlstring)
+  .type('application/json')
+  .send(jsonstring)
   .read(callback)
 ```
 
@@ -90,13 +89,10 @@ request.post('/')
   .read(callback)
 ```
 
+### Request.accept(type)
 
-```js
-request.post('/')
-  .type('application/json')
-  .send(jsonstring)
-  .read(callback)
-```
+  Set the "Accept" header. As with `Request.type()`
+  shorthand strings are allowed
 
 ### Request.timeout(ms)
 
@@ -180,7 +176,7 @@ request.post('/user')
   Set the path. `arguments` is joined to form the path:
 
 ```js
-request.get('https://api.github.com')
+get('https://api.github.com')
   .path('repos', user, repo, 'tags')
   .read(callback)
 ```
