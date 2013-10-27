@@ -368,6 +368,35 @@ describe('request', function(){
 			})
 		})
 	})
+
+	describe('req.path(...)', function(){
+		it('should set the url path', function(done){
+			get('http://localhost:5000')
+			.path('/movies/all/0')
+			.read(function(res){
+				assert(res == 'first movie page')
+				done()
+			})
+		})
+
+		it('should handle missing leading slash', function(done){
+			get('http://localhost:5000')
+			.path('movies/all/0')
+			.read(function(res){
+				assert(res == 'first movie page')
+				done()
+			})
+		})
+
+		it('should join path segments', function(done){
+			get('http://localhost:5000')
+			.path('movies', 'all', 0)
+			.read(function(res){
+				assert(res == 'first movie page')
+				done()
+			})
+		})
+	})
 })
 
 describe('Basic auth', function(){

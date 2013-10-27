@@ -5,6 +5,7 @@ var base64 = require('base64-encode')
 var statusCodes = require('./codes')
 var lazy = require('lazy-property')
 var inherit = require('inherit')
+var join = require('path/join')
 var merge = require('merge')
 var qs = require('qs')
 
@@ -358,6 +359,25 @@ Request.prototype.auth = function(user, pass){
 
 Request.prototype.maxRedirects = function(n){
 	this._maxRedirects = n
+	return this
+}
+
+/**
+ * Set the path. `arguments` is joined to form the path:
+ *
+ *    request.get('https://api.github.com')
+ *      .path('repos', user, repo, 'tags')
+ *
+ * @param {String} ...
+ * @return {this}
+ * @api public
+ */
+
+Request.prototype.path = function(){
+	var path = join.apply(null, arguments)
+	this.options.path = path[0] != '/'
+		? '/' + path
+		: path
 	return this
 }
 
