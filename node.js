@@ -29,9 +29,7 @@ exports.protocols = {
  */
 
 methods.forEach(function(method){
-	var name = method == 'delete' ? 'del' : method
-	method = method.toUpperCase()
-	exports[name] = function(url){
+	exports[method] = function(url){
 		if (typeof url == 'string') {
 			if (url.indexOf('http') !== 0) url = 'http://' + url
 			url = parse(url, true)
@@ -41,6 +39,7 @@ methods.forEach(function(method){
 		if (!url.hostname) url.hostname = 'localhost'
 		return new Request(url).set('user-agent', userAgent)
 	}
+	method = method.toUpperCase()
 })
 
 var userAgent = [
@@ -74,9 +73,9 @@ Request.prototype.serializeData = function(){
 }
 
 /**
- * create the real request
+ * The real request, created lazily
  *
- * @return {OutgoingMessage}
+ * @type {OutgoingMessage}
  * @api private
  */
 
@@ -118,7 +117,7 @@ Request.prototype.onNeed = function(){
 /**
  * get a response object
  *
- * @return {Result} for IncomingMessage
+ * @type {Result<IncomingMessage>}
  * @api private
  */
 
@@ -233,6 +232,7 @@ Request.prototype.pipe = function(stream, options){
  * @param {Object} url
  * @param {String} link
  * @return {Object}
+ * @api private
  */
 
 function redirection(url, link){

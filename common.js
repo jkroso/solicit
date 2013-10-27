@@ -106,14 +106,14 @@ lazy(Request.prototype, 'redirects', Array)
  *
  * Examples:
  *
- *      req.get('/')
- *        .set('Accept', 'application/json')
- *        .set('X-API-Key', 'foobar')
- *        .end(callback)
+ *   request.get('/')
+ *     .set('Accept', 'application/json')
+ *     .set('X-API-Key', 'foobar')
+ *     .read(callback)
  *
- *      req.get('/')
- *        .set({ Accept: 'application/json', 'X-API-Key': 'foobar' })
- *        .end(callback)
+ *   request.get('/')
+ *     .set({ Accept: 'application/json', 'X-API-Key': 'foobar' })
+ *     .read(callback)
  *
  * @param {String|Object} field
  * @param {String} val
@@ -165,20 +165,20 @@ Request.prototype.query = function(val){
  *
  * Examples:
  *
- *      request.post('/')
- *        .type('xml')
- *        .send(xmlstring)
- *        .end(callback)
+ *   request.post('/')
+ *     .type('xml')
+ *     .send(xmlstring)
+ *     .read(callback)
  *
- *      request.post('/')
- *        .type('json')
- *        .send(jsonstring)
- *        .end(callback)
+ *   request.post('/')
+ *     .type('json')
+ *     .send(jsonstring)
+ *     .read(callback)
  *
- *      request.post('/')
- *        .type('application/json')
- *        .send(jsonstring)
- *        .end(callback)
+ *   request.post('/')
+ *     .type('application/json')
+ *     .send(jsonstring)
+ *     .read(callback)
  *
  * @param {String} type
  * @return {this}
@@ -276,35 +276,35 @@ Request.prototype.agent = function(agent){
  *
  * Examples:
  *
- *       // manual json
- *       request.post('/user')
- *         .type('json')
- *         .send('{"name":"tj"}')
- *         .end(callback)
+ *   // manual json
+ *   request.post('/user')
+ *     .type('json')
+ *     .send('{"name":"tj"}')
+ *     .read(callback)
  *
- *       // auto json
- *       request.post('/user')
- *         .send({ name: 'tj' })
- *         .end(callback)
+ *   // auto json
+ *   request.post('/user')
+ *     .send({ name: 'tj' })
+ *     .read(callback)
  *
- *       // manual x-www-form-urlencoded
- *       request.post('/user')
- *         .type('form')
- *         .send('name=tj')
- *         .end(callback)
+ *   // manual x-www-form-urlencoded
+ *   request.post('/user')
+ *     .type('form')
+ *     .send('name=tj')
+ *     .read(callback)
  *
- *       // auto x-www-form-urlencoded
- *       request.post('/user')
- *         .type('form')
- *         .send({ name: 'tj' })
- *         .end(callback)
+ *   // auto x-www-form-urlencoded
+ *   request.post('/user')
+ *     .type('form')
+ *     .send({ name: 'tj' })
+ *     .read(callback)
  *
- *       // string defaults to x-www-form-urlencoded
- *       request.post('/user')
- *         .send('name=tj')
- *         .send('foo=bar')
- *         .send('bar=baz')
- *         .end(callback)
+ *   // string defaults to x-www-form-urlencoded
+ *   request.post('/user')
+ *     .send('name=tj')
+ *     .send('foo=bar')
+ *     .send('bar=baz')
+ *     .read(callback)
  *
  * @param {String|Object} data
  * @return {this}
@@ -365,8 +365,9 @@ Request.prototype.maxRedirects = function(n){
 /**
  * Set the path. `arguments` is joined to form the path:
  *
- *    request.get('https://api.github.com')
- *      .path('repos', user, repo, 'tags')
+ *   request.get('https://api.github.com')
+ *     .path('repos', user, repo, 'tags')
+ *     .read(callback)
  *
  * @param {String} ...
  * @return {this}
@@ -434,5 +435,5 @@ function parseLinks(str){
 		var rel = parts[1].split(/ *= */)[1].slice(1, -1)
 		obj[rel] = url
 		return obj
-	}, {});
+	}, {})
 }

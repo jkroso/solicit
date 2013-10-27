@@ -30,9 +30,7 @@ module.exports = exports = Request
 	'patch',
 	'delete',
 ].forEach(function(method){
-	var name = method == 'delete' ? 'del' : method
-	method = method.toUpperCase()
-	exports[name] = function(url){
+	exports[method] = function(url){
 		if (typeof url == 'string') url = parse(url, true)
 		if (!url.hostname) url.hostname = location.hostname
 		if (!url.protocol) url.protocol = location.protocol
@@ -41,6 +39,7 @@ module.exports = exports = Request
 		url.method = method
 		return new Request(url)
 	}
+	method = method.toUpperCase()
 })
 
 Request.prototype.set = function(key, value){
