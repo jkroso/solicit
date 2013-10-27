@@ -88,6 +88,16 @@ describe('request', function(){
 		})
 	})
 
+	describe('default headers', function(){
+		it('user-agent', function(done){
+			post('http://localhost:5000/echo')
+			.response.read(function(res){
+				assert(res.header['user-agent'])
+				done()
+			})
+		})
+	})
+
 	describe('.response', function(){
 		describe('res.charset', function(){
 			it('should be set when present', function(done){

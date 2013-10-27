@@ -121,11 +121,8 @@ lazy(Request.prototype, 'redirects', Array)
  */
 
 Request.prototype.set = function(field, val){
-	if (typeof field == 'object') {
-		merge(this.header, field)
-	} else {
-		this.header[field] = val
-	}
+	if (typeof field == 'object') merge(this.header, field)
+	else this.header[field] = val
 	return this
 }
 

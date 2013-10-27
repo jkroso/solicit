@@ -39,9 +39,16 @@ methods.forEach(function(method){
 		url.method = method
 		url.agent = false
 		if (!url.hostname) url.hostname = 'localhost'
-		return new Request(url)
+		return new Request(url).set('user-agent', userAgent)
 	}
 })
+
+var userAgent = [
+	process.title,
+	process.version,
+	process.platform,
+	process.arch
+].join(' ')
 
 /**
  * translate `this._data` to a string so it can
