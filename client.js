@@ -42,6 +42,12 @@ module.exports = exports = Request
 })
 
 /**
+ * default properties
+ */
+
+Request.prototype.progress = 0
+
+/**
  * specialize the `set` and `type` methods
  */
 
@@ -117,7 +123,7 @@ lazy(Request.prototype, 'response', function(){
 	}
 
 	xhr.onprogress = function(e){
-		e.percent = e.loaded / e.total * 100
+		self.progress = e.percent = e.loaded / e.total * 100
 		self.emit('progress', e)
 	}
 

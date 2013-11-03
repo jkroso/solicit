@@ -11,11 +11,12 @@ describe('browser only tests', function(){
 			get('/image').on('progress', function(e){
 				e.percent.should.be.a('number')
 				e.percent.should.be.within(0, 100)
+				this.should.have.property('progress', e.percent)
 				calls++
 			}).read(function(blob){
 				calls.should.be.above(0)
 				done()
-			})
+			}).should.have.property('progress', 0)
 		})
 	})
 
