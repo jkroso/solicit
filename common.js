@@ -219,15 +219,12 @@ Request.prototype.timeout = function(ms){
  */
 
 Request.prototype.startTimer = function(){
-	var timeout = this._timeout
-	var self = this
-	if (timeout) {
+	if (this._timeout) {
+		var self = this
 		this._timer = setTimeout(function(){
-			var err = new Error('timeout of ' + timeout + 'ms exceeded')
-			err.timeout = timeout
+			self.timeoutError()
 			self.abort()
-			self.response.error(err)
-		}, timeout)
+		}, this._timeout)
 	}
 }
 
@@ -242,6 +239,19 @@ Request.prototype.clearTimeout = function(){
 	this._timeout = 0
 	clearTimeout(this._timer)
 	return this
+}
+
+/**
+ * set the response to be a timeout error
+ *
+ * @api private
+ */
+
+Request.prototype.timeoutError = function(){
+	var time = this._timeout
+	var err = new Error('timeout of ' + time + 'ms exceeded')
+	err.timeout = time
+	this.response.error(err)
 }
 
 /**

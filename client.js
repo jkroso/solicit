@@ -82,7 +82,9 @@ Request.prototype.onNeed = function(){
 		var parse = self._parser
 			? self._parser
 			: exports.parse[res.type]
-		write.call(self, parse ? parse(res.text) : res.text)
+		write.call(self, parse
+			? parse(res.text)
+			: res.text)
 	}, function(e){
 		self.error(e)
 	})
@@ -186,13 +188,6 @@ function crossDomainError(){
 	var err = new Error('Origin is not allowed by Access-Control-Allow-Origin')
 	err.crossDomain = true
 	return err
-}
-
-Request.prototype.timeoutError = function(){
-	var time = this._timeout
-	var err = new Error('timeout of ' + time + 'ms exceeded')
-	err.timeout = time
-	this.response.error(err)
 }
 
 Request.prototype.write = function(s){
