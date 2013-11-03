@@ -1,7 +1,12 @@
 
+var screenshot = require('url-to-screenshot')
 var express = require('express')
+var Result = require('result')
 var path = require('path')
 var app = express()
+
+// request logging
+// app.use(express.logger('dev'))
 
 // allow cross-origin
 // app.use(function(req, res, next){
@@ -21,6 +26,30 @@ app.get('/login', function(req, res){
 	res.send('<form id="login"></form>')
 })
 
+// cache image
+var image = new Result
+screenshot('http://localhost:5000/').capture(function(err, img){
+	if (err) image.error(err)
+	else image.write(img)
+})
+
+app.get('/image', function(req, res){
+	image.read(function(img){
+		res.set('content-length', img.length)
+		res.type('png')
+		var i = 0
+		// simulate a slow write
+		function next(){
+			var start = i
+			i = Math.min(i + 1e3, img.length)
+			res.write(img.slice(start, i))
+			if (i == img.length) res.end()
+			else setTimeout(next, 20)
+		}
+		next()
+	})
+})
+
 app.get('/json', function(req, res){
 	res.send({ name: 'manny' })
 })
@@ -31,10 +60,6 @@ app.get('/query', function(req, res){
 
 app.del('/query', function(req, res){
 	res.send(req.query)
-})
-
-app.get('/', function(req, res){
-	res.redirect('/movies')
 })
 
 app.get('/movies', function(req, res){
@@ -131,8 +156,8 @@ app.use(express.static(path.dirname(__dirname), { hidden: false }))
 
 // directory serving
 app.use(express.directory(path.dirname(__dirname), {
-  hidden: false,
-  icons: true
+	hidden: false,
+	icons: true
 }))
 
 app.listen(5000, function(){

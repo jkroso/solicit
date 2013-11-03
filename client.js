@@ -2,7 +2,6 @@
 var lazy = require('lazy-property')
 var format = require('url').format
 var Request = require('./common')
-var set = Request.prototype.set
 var Result = require('result')
 var write = Result.prototype.write
 var parse = require('url').parse
@@ -42,10 +41,21 @@ module.exports = exports = Request
 	method = method.toUpperCase()
 })
 
+/**
+ * specialize the `set` and `type` methods
+ */
+
+var _set = Request.prototype.set
 Request.prototype.set = function(key, value){
 	if (typeof key == 'string'
 	&& key.toLowerCase() in unsafeHeaders) return this
-	return set.call(this, key, value)
+	return _set.call(this, key, value)
+}
+
+var _type = Request.prototype.type
+Request.prototype.type = function(str){
+	this.request.responseType = str
+	return _type.call(this, str)
 }
 
 /**
@@ -64,35 +74,52 @@ Request.prototype.withCredentials = function(){
 	return this
 }
 
+Request.prototype.onNeed = function(){
+	var self = this
+	this.response.read(function(res){
+		if (res.statusType > 2) return self.error(res)
+		res.text = res.response
+		var parse = self._parser
+			? self._parser
+			: exports.parse[res.type]
+		write.call(self, parse ? parse(res.text) : res.text)
+	}, function(e){
+		self.error(e)
+	})
+}
+
 lazy(Request.prototype, 'request', getXHR)
 
 lazy(Request.prototype, 'response', function(){
-	var result = new Result
 	var data = this.serializeData()
+	var result = new Result
 	var xhr = this.request
 	var url = this.options
 	var self = this
 
-	// CORS
-	if (this._withCredentials) xhr.withCredentials = true
-
 	xhr.onreadystatechange = function(){
-		if (xhr.readyState != 4) return
-		if (!xhr.status) {
-			if (self.aborted) return self.timeoutError()
-			return result.error(crossDomainError())
+		switch (xhr.readyState) {
+			case 1: self.emit('open'); break
+			case 2: self.emit('sent'); break
+			case 3: self.emit('receiving'); break
+			case 4:
+				if (!xhr.status) {
+					if (self.aborted) return self.timeoutError()
+					return result.error(crossDomainError())
+				}
+				xhr.statusCode = xhr.status
+				xhr.headers = parseHeader(xhr.getAllResponseHeaders())
+				self.res = exports.sugar(xhr)
+				result.write(xhr)
 		}
-		xhr.statusCode = xhr.status
-		xhr.headers = parseHeader(xhr.getAllResponseHeaders())
-		self.res = exports.sugar(xhr)
-		result.write(xhr)
 	}
 
-	if (xhr.upload) xhr.upload.onprogress = function(e){
+	xhr.onprogress = function(e){
 		e.percent = e.loaded / e.total * 100
 		self.emit('progress', e)
 	}
 
+	if (this._withCredentials) xhr.withCredentials = true
 	url.search = qs.stringify(url.query)
 	url.host = url.hostname + ':' + url.port
 	xhr.open(url.method, format(url), true)
@@ -117,15 +144,15 @@ lazy(Request.prototype, 'response', function(){
  */
 
 function parseHeader(str) {
-  var lines = str.split(/\r?\n/)
-  lines.pop() // trailing CRLF
-  return reduce(lines, function(header, line){
-    var index = line.indexOf(':')
-    var field = line.slice(0, index).toLowerCase()
-    var val = line.slice(index + 1).trim()
-    header[field] = val
-    return header
-  }, {})
+	var lines = str.split(/\r?\n/)
+	lines.pop() // trailing CRLF
+	return reduce(lines, function(header, line){
+		var index = line.indexOf(':')
+		var field = line.slice(0, index).toLowerCase()
+		var val = line.slice(index + 1).trim()
+		header[field] = val
+		return header
+	}, {})
 }
 
 Request.prototype.serializeData = function(){
@@ -162,24 +189,10 @@ function crossDomainError(){
 }
 
 Request.prototype.timeoutError = function(){
-  var time = this._timeout
-  var err = new Error('timeout of ' + time + 'ms exceeded')
-  err.timeout = time
-  this.response.error(err)
-}
-
-Request.prototype.onNeed = function(){
-	var self = this
-	this.response.read(function(res){
-		if (res.statusType > 2) return self.error(res)
-		res.text = res.responseText
-		var parse = self._parser
-			? self._parser
-			: exports.parse[res.type]
-		write.call(self, parse ? parse(res.text) : res.text)
-	}, function(e){
-		self.error(e)
-	})
+	var time = this._timeout
+	var err = new Error('timeout of ' + time + 'ms exceeded')
+	err.timeout = time
+	this.response.error(err)
 }
 
 Request.prototype.write = function(s){

@@ -1,0 +1,37 @@
+
+<title>loading an image</title>
+
+<style>
+	body {
+		padding: 60px;
+	}
+	#progress {
+		width: 300px;
+		height: 2px;
+		background: #eee;
+	}
+	#progress > div {
+		width: 0px;
+		height: 2px;
+		background: #0b90ff;
+		-webkit-transition: width 100ms ease-out;
+	}
+	img {
+		width: 90%;
+	}
+</style>
+
+<div id="progress"><div></div></div>
+
+<script>
+	var get = require('..').get
+
+	get('/image').type('blob').on('progress', function(e){
+		progress.firstChild.style.width = (e.percent | 0) + '%'
+	}).read(function(blob){
+		progress.parentNode.removeChild(progress)
+		var img = new Image
+		img.src = URL.createObjectURL(blob)
+		document.body.appendChild(img)
+	})
+</script>

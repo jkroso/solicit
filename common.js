@@ -382,7 +382,8 @@ Request.prototype.maxRedirects = function(n){
 
 Request.prototype.path = function(){
 	var path = join.apply(null, arguments)
-	this.options.path = path[0] != '/'
+	this.options.pathname =
+	this.options.path = !(/^\//).test(path)
 		? '/' + path
 		: path
 	return this

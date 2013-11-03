@@ -9,13 +9,12 @@ describe('request', function(){
 			var redirects = []
 
 			request
-			.get('http://localhost:5000/')
+			.get('http://localhost:5000/movies')
 			.on('redirect', function(res){
 				redirects.push(res.headers.location)
 			})
 			.read(function(res){
 				redirects.should.eql([
-					'/movies',
 					'/movies/all',
 					'/movies/all/0'
 				])
@@ -25,10 +24,9 @@ describe('request', function(){
 
 		it('should follow Location', function(done){
 			request
-			.get('http://localhost:5000/')
+			.get('http://localhost:5000/movies')
 			.read(function(res){
 				this.redirects.should.eql([
-					'http://localhost:5000/movies',
 					'http://localhost:5000/movies/all',
 					'http://localhost:5000/movies/all/0'
 				])
@@ -42,8 +40,7 @@ describe('request', function(){
 			request
 			.get('http://localhost:5000/foreign-host')
 			.maxRedirects(1)
-			.response()
-			.read(function(res){
+			.response.read(function(res){
 				res.header.server.should.match(/github\.com/i)
 				res.status.should.equal(200)
 				done()
@@ -95,11 +92,10 @@ describe('request', function(){
 	describe('req.maxRedirects(n)', function(){
 		it('should alter the default number of redirects to follow', function(done){
 			request
-			.get('http://localhost:5000/')
-			.maxRedirects(2)
+			.get('http://localhost:5000/movies')
+			.maxRedirects(1)
 			.read(null, function(res){
 				this.redirects.should.eql([
-					'http://localhost:5000/movies',
 					'http://localhost:5000/movies/all'
 				])
 				res.message.should.match(/Moved Temporarily/)

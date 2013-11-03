@@ -6,7 +6,7 @@ var fs = require('fs')
 
 var app = express()
 
-app.use(express.bodyParser())
+app.use(express.json())
 
 app.post('/', function(req, res){
 	res.send(req.body)
@@ -25,7 +25,7 @@ describe('request pipe', function(){
 
 	it('should act as a writable stream', function(done){
 		fs.createReadStream(fixtures + '/user.json')
-			.pipe(request.post('http://localhost:3020').type('json'))
+			.pipe(request.post('localhost:3020').type('json'))
 			.read(function(res){
 				res.should.eql({ name: 'tobi' })
 				done()
@@ -34,7 +34,7 @@ describe('request pipe', function(){
 
 	it('should act as a readable stream', function(done){
 		request
-			.get('http://localhost:3020/user.json')
+			.get('localhost:3020/user.json')
 			.pipe(fs.createWriteStream(fixtures + '/tmp.json'))
 			.on('finish', function(){
 				var json = fs.readFileSync(fixtures + '/tmp.json', 'utf8')
