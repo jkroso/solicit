@@ -60,7 +60,7 @@ Request.prototype.set = function(key, value){
 
 var _type = Request.prototype.type
 Request.prototype.type = function(str){
-	this.request.responseType = str
+	if (str == 'blob') this._responseType = str
 	return _type.call(this, str)
 }
 
@@ -127,10 +127,11 @@ lazy(Request.prototype, 'response', function(){
 		self.emit('progress', e)
 	}
 
-	if (this._withCredentials) xhr.withCredentials = true
 	url.search = qs.stringify(url.query)
 	url.host = url.hostname + ':' + url.port
 	xhr.open(url.method, format(url), true)
+	if (this._withCredentials) xhr.withCredentials = true
+	xhr.responseType = this._responseType || 'text'
 
 	for (var key in this.header) {
 		xhr.setRequestHeader(key, this.header[key])
