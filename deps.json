@@ -17,7 +17,7 @@
     "merge": "http://github.com/yields/merge/tarball/1.0.0",
     "path": "http://github.com/jkroso/path/tarball/1.1.0",
     "reduce": "http://github.com/jkroso/reduce/tarball/0.1.3",
-    "result": "http://registry.npmjs.org/result/-/result-0.4.2.tgz",
+    "result": "http://registry.npmjs.org/result/-/result-0.4.3.tgz",
     "base64-encode": "http://github.com/ForbesLindesay/base64-encode/tarball/1.0.1",
     "type": "http://github.com/jkroso/type/tarball/1.0.2",
     "emitter": "http://github.com/jkroso/emitter/tarball/0.9.0"
