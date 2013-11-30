@@ -5,7 +5,6 @@ var Request = require('./common')
 var Result = require('result')
 var write = Result.prototype.write
 var parse = require('url').parse
-var reduce = require('reduce')
 var merge = require('merge')
 var getXHR = require('xhr')
 var type = require('type')
@@ -153,9 +152,7 @@ lazy(Request.prototype, 'response', function(){
  */
 
 function parseHeader(str) {
-	var lines = str.split(/\r?\n/)
-	lines.pop() // trailing CRLF
-	return reduce(lines, function(header, line){
+	return str.trim().split(/\r?\n/).reduce(function(header, line){
 		var index = line.indexOf(':')
 		var field = line.slice(0, index).toLowerCase()
 		var val = line.slice(index + 1).trim()
@@ -208,28 +205,28 @@ Request.prototype.end = function(s){
 	return this
 }
 
-var unsafeHeaders = reduce([
-	'accept-charset',
-	'accept-encoding',
+var unsafeHeaders = [
 	'access-control-request-headers',
 	'access-control-request-method',
-	'connection',
-	'content-length',
-	'cookie',
-	'cookie2',
 	'content-transfer-encoding',
-	'date',
-	'expect',
-	'host',
+	'transfer-encoding',
+	'accept-encoding',
+	'content-length',
+	'accept-charset',
+	'connection',
 	'keep-alive',
-	'origin',
+	'user-agent',
 	'referer',
 	'trailer',
-	'transfer-encoding',
+	'cookie2',
 	'upgrade',
-	'user-agent',
-	'via',
-], function(obj, key){
+	'origin',
+	'cookie',
+	'expect',
+	'date',
+	'host',
+	'via'
+].reduce(function(obj, key){
 	obj[key] = true
 	return obj
 }, {})
