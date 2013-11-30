@@ -1,5 +1,4 @@
 
-var assert = require('assert/index')
 var chai = require('./chai')
 var request = require('..')
 var post = request.post
