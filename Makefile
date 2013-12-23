@@ -12,10 +12,8 @@ test: node_modules
 		--bail
 
 node_modules: *.json
-	@packin install \
+	@packin install -R \
 		--meta package.json,component.json,deps.json \
-		--folder node_modules \
-		--executables \
-		--no-retrace
+		--folder node_modules
 
 .PHONY: serve test

@@ -2,6 +2,7 @@
   "name": "solicit",
   "version": "0.0.5",
   "description": "a declarative http client for node and browser",
+  "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
     "base64-encode": "ForbesLindesay/base64-encode#1.0.1",
     "inherit": "nathan7/inherit#f1a75b4",
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "assert": "jkroso/assert#0.2.1",
+    "markdown-middleware": "~0.1.3",
+    "reduce": "jkroso/reduce",
     "url-to-screenshot": "*",
     "serve-js": "~0.4.2",
     "express": "~3.4.3",
