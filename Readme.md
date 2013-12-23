@@ -195,4 +195,4 @@ get('https://api.github.com')
 
 ## Running the tests
 
-Just run `make` and navigate your browser to the test directory.
+Just run `make` and navigate your browser to [test/index.html](test/index.html).

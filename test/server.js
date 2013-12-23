@@ -150,6 +150,9 @@ auth.get('/', function(req, res){
 
 // compile javascript and html
 app.use(require('serve-js')(path.dirname(__dirname)))
+app.use(require('markdown-middleware')({
+	directory: path.dirname(__dirname)
+}))
 
 // static files
 app.use(express.static(path.dirname(__dirname), { hidden: false }))
