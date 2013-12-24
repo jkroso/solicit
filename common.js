@@ -1,10 +1,10 @@
 
 var Deferred = require('result/defer')
-var Emitter = require('emitter/light')
 var base64 = require('base64-encode')
 var statusCodes = require('./codes')
 var lazy = require('lazy-property')
 var inherit = require('inherit')
+var Emitter = require('emitter')
 var join = require('path/join')
 var merge = require('merge')
 var qs = require('qs')
