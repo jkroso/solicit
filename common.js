@@ -1,6 +1,7 @@
 
 var Deferred = require('result/defer')
 var base64 = require('base64-encode')
+var setter = require('setter-method')
 var statusCodes = require('./codes')
 var lazy = require('lazy-property')
 var inherit = require('inherit')
@@ -80,10 +81,24 @@ inherit(Request, Deferred)
 Emitter(Request.prototype)
 
 /**
- * default config
+ * Get/Set max redirects
+ *
+ * @param {Number} n
+ * @return {this}
+ * @api public
  */
 
-Request.prototype._maxRedirects = Infinity
+setter(Request.prototype, 'maxRedirects', Infinity)
+
+/**
+ * Get/Set timeout in ms
+ *
+ * @param {Number} ms
+ * @return {this}
+ * @api public
+ */
+
+setter(Request.prototype, 'timeout', Infinity)
 
 /**
  * listen to "pipe" on all instances. We need to know
@@ -200,32 +215,18 @@ Request.prototype.accept = function(type){
 }
 
 /**
- * Set timeout to `ms`.
- *
- * @param {Number} ms
- * @return {this}
- * @api public
- */
-
-Request.prototype.timeout = function(ms){
-	this._timeout = ms
-	return this
-}
-
-/**
  * start the requests timeout
  *
  * @api private
  */
 
 Request.prototype.startTimer = function(){
-	if (this._timeout) {
-		var self = this
-		this._timer = setTimeout(function(){
-			self.timeoutError()
-			self.abort()
-		}, this._timeout)
-	}
+	if (this._timeout == Infinity) return
+	var self = this
+	this._timer = setTimeout(function(){
+		self.timeoutError()
+		self.abort()
+	}, this._timeout)
 }
 
 /**
@@ -236,7 +237,7 @@ Request.prototype.startTimer = function(){
  */
 
 Request.prototype.clearTimeout = function(){
-	this._timeout = 0
+	this._timeout = Infinity
 	clearTimeout(this._timer)
 	return this
 }
@@ -363,19 +364,6 @@ Request.prototype.send = function(data){
 
 Request.prototype.auth = function(user, pass){
 	return this.set('Authorization', 'Basic ' + base64(user + ':' + pass))
-}
-
-/**
- * Set the max redirects to `n`.
- *
- * @param {Number} n
- * @return {this}
- * @api public
- */
-
-Request.prototype.maxRedirects = function(n){
-	this._maxRedirects = n
-	return this
 }
 
 /**
