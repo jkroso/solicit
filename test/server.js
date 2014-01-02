@@ -163,6 +163,4 @@ app.use(express.directory(path.dirname(__dirname), {
 	icons: true
 }))
 
-app.listen(5000, function(){
-	console.log('Server listening on port:%d', 5000)
-})
+app.listen(5000)
