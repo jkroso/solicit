@@ -4,7 +4,6 @@ var Request = require('./common')
 var parse = require('url').parse
 var methods = require('methods')
 var Result = require('result')
-var write = Result.prototype.write
 var merge = require('merge')
 var zlib = require('zlib')
 var qs = require('qs')
@@ -97,21 +96,23 @@ lazy(Request.prototype, 'request', function(){
 
 Request.prototype.onNeed = function(){
 	var self = this
-	this.response.read(function(res){
-		if (res.statusType > 2) return onError(res)
+	return this.response.then(function(res){
+		if (res.statusType > 2) throw res
+		var result = new Result
 
 		res.text = '' // TODO: support binary
 		res.on('data', function(data){
-			res.text += data || ''
+			this.text += data || ''
 		}).on('end', function(){
 			var parse = self._parser || exports.parse[res.type]
-			write.call(self, parse ? parse(res.text) : res.text)
-		}).on('error', onError)
-	}, onError)
+			self.write = Result.prototype.write // HACK
+			result.write(parse ? parse(res.text) : res.text)
+		}).on('error', function(e){
+			result.error(e)
+		})
 
-	function onError(e){
-		self.error(e)
-	}
+		return result
+	})
 }
 
 /**

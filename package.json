@@ -1,6 +1,6 @@
 {
   "name": "solicit",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "a declarative http client for node and browser",
   "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
@@ -16,7 +16,7 @@
     "lazy-property": "~0.0.2",
     "result-type": "1.0.0",
     "methods": "0.0.1",
-    "result": "~0.4.4",
+    "result": "1.0.0",
     "qs": "~0.6.5"
   },
   "devDependencies": {
@@ -24,9 +24,14 @@
     "markdown-middleware": "~0.1.3",
     "reduce": "jkroso/reduce",
     "url-to-screenshot": "*",
-    "serve-js": "~0.4.2",
-    "express": "~3.4.3",
-    "mocha": "*",
+    "serve-js": "~0.4.5",
+    "express": "~3.4.8",
+    "hydro-focus": "*",
+    "hydro-html": "*",
+    "hydro-chai": "*",
+    "hydro-dot": "*",
+    "hydro-bdd": "*",
+    "hydro": "*",
     "chai": "*"
   },
   "files": [
