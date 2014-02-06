@@ -16,7 +16,7 @@
     "lazy-property": "~0.0.2",
     "result-type": "1.0.0",
     "methods": "0.0.1",
-    "result": "1.0.0",
+    "result": "~1.0.0",
     "qs": "~0.6.5"
   },
   "devDependencies": {
@@ -24,7 +24,7 @@
     "markdown-middleware": "~0.1.3",
     "reduce": "jkroso/reduce",
     "url-to-screenshot": "*",
-    "serve-js": "~0.4.5",
+    "serve-js": "~0.5.1",
     "express": "~3.4.8",
     "hydro-focus": "*",
     "hydro-html": "*",

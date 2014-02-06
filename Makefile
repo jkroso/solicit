@@ -2,12 +2,11 @@ serve: node_modules test/pid
 	open http://localhost:5000/test/index.html
 
 test/pid:
-	@node test/server.js &
-	@echo $$! > test/pid
+	@node test/server.js & echo $$! > test/pid
 	@sleep 1 # server needs time to boot
 
 kill:
-	@kill $$(cat test/pid 2&> /dev/null) 2&> /dev/null
+	@kill $$(cat test/pid)
 	@rm -f test/pid
 
 test: node_modules test/pid

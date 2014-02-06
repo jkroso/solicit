@@ -6,7 +6,8 @@ var path = require('path')
 var app = express()
 
 // request logging
-// app.use(express.logger('dev'))
+app.use(express.logger('dev'))
+app.use(express.errorHandler())
 
 // allow cross-origin
 // app.use(function(req, res, next){

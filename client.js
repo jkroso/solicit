@@ -2,9 +2,8 @@
 var lazy = require('lazy-property')
 var format = require('url').format
 var Request = require('./common')
-var Result = require('result')
-var write = Result.prototype.write
 var parse = require('url').parse
+var Result = require('result')
 var merge = require('merge')
 var getXHR = require('xhr')
 var type = require('type')
@@ -81,17 +80,14 @@ Request.prototype.withCredentials = function(){
 
 Request.prototype.onNeed = function(){
   var self = this
-  this.response.read(function(res){
-    if (res.statusType > 2) return self.error(res)
+  return this.response.then(function(res){
+    if (res.statusType > 2) throw res
+    self.write = Result.prototype.write // HACK
     res.text = res.response
-    var parse = self._parser
-      ? self._parser
-      : exports.parse[res.type]
-    write.call(self, parse
+    var parse = self._parser || exports.parse[res.type]
+    return parse
       ? parse(res.text)
-      : res.text)
-  }, function(e){
-    self.error(e)
+      : res.text
   })
 }
 
