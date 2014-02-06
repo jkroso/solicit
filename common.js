@@ -23,12 +23,12 @@ exports.sugar = sugar
  */
 
 var mime = [
-	'form',
-	'urlencoded',
-	'form-data'
+  'form',
+  'urlencoded',
+  'form-data'
 ].reduce(function(types, mime){
-	types[mime] = 'application/x-www-form-urlencoded'
-	return types
+  types[mime] = 'application/x-www-form-urlencoded'
+  return types
 }, Object.create(require('mime/types')))
 
 /**
@@ -36,8 +36,8 @@ var mime = [
  */
 
 exports.serialize = {
-	'application/json': JSON.stringify,
-	'application/x-www-form-urlencoded': qs.stringify
+  'application/json': JSON.stringify,
+  'application/x-www-form-urlencoded': qs.stringify
 }
 
 /**
@@ -45,8 +45,8 @@ exports.serialize = {
  */
 
 exports.parse = {
-	'application/json': JSON.parse,
-	'application/x-www-form-urlencoded': qs.parse
+  'application/json': JSON.parse,
+  'application/x-www-form-urlencoded': qs.parse
 }
 
 
@@ -57,15 +57,15 @@ exports.parse = {
  */
 
 function Request(options){
-	this.options = options
-	this.header = {}
-	if (options.method != 'HEAD') {
-		this.set('Accept-Encoding', 'gzip, deflate')
-	}
-	if (options.auth) {
-		var auth = options.auth.split(':')
-		this.auth(auth[0], auth[1])
-	}
+  this.options = options
+  this.header = {}
+  if (options.method != 'HEAD') {
+    this.set('Accept-Encoding', 'gzip, deflate')
+  }
+  if (options.auth) {
+    var auth = options.auth.split(':')
+    this.auth(auth[0], auth[1])
+  }
 }
 
 /**
@@ -107,7 +107,7 @@ setter(Request.prototype, 'timeout', Infinity)
  */
 
 Request.prototype.on('pipe', function(){
-	this.pipedTo = true
+  this.pipedTo = true
 })
 
 /**
@@ -137,9 +137,9 @@ lazy(Request.prototype, 'redirects', Array)
  */
 
 Request.prototype.set = function(field, val){
-	if (typeof field == 'object') merge(this.header, field)
-	else this.header[field] = val
-	return this
+  if (typeof field == 'object') merge(this.header, field)
+  else this.header[field] = val
+  return this
 }
 
 /**
@@ -151,7 +151,7 @@ Request.prototype.set = function(field, val){
  */
 
 Request.prototype.get = function(field){
-	return this.header[field]
+  return this.header[field]
 }
 
 /**
@@ -169,10 +169,10 @@ Request.prototype.get = function(field){
  */
 
 Request.prototype.query = function(val){
-	if (typeof val == 'string') val = qs.parse(val)
-	if (!this.options.query) this.options.query = {}
-	merge(this.options.query, val)
-	return this
+  if (typeof val == 'string') val = qs.parse(val)
+  if (!this.options.query) this.options.query = {}
+  merge(this.options.query, val)
+  return this
 }
 
 /**
@@ -195,8 +195,8 @@ Request.prototype.query = function(val){
  */
 
 Request.prototype.type = function(type){
-	if (type[0] == '.') type = type.slice(1)
-	return this.set('Content-Type', type in mime ? mime[type] : type)
+  if (type[0] == '.') type = type.slice(1)
+  return this.set('Content-Type', type in mime ? mime[type] : type)
 }
 
 /**
@@ -210,8 +210,8 @@ Request.prototype.type = function(type){
  */
 
 Request.prototype.accept = function(type){
-	if (type[0] == '.') type = type.slice(1)
-	return this.set('Accept', type in mime ? mime[type] : type)
+  if (type[0] == '.') type = type.slice(1)
+  return this.set('Accept', type in mime ? mime[type] : type)
 }
 
 /**
@@ -221,12 +221,12 @@ Request.prototype.accept = function(type){
  */
 
 Request.prototype.startTimer = function(){
-	if (this._timeout == Infinity) return
-	var self = this
-	this._timer = setTimeout(function(){
-		self.timeoutError()
-		self.abort()
-	}, this._timeout)
+  if (this._timeout == Infinity) return
+  var self = this
+  this._timer = setTimeout(function(){
+    self.timeoutError()
+    self.abort()
+  }, this._timeout)
 }
 
 /**
@@ -237,9 +237,9 @@ Request.prototype.startTimer = function(){
  */
 
 Request.prototype.clearTimeout = function(){
-	this._timeout = Infinity
-	clearTimeout(this._timer)
-	return this
+  this._timeout = Infinity
+  clearTimeout(this._timer)
+  return this
 }
 
 /**
@@ -249,10 +249,10 @@ Request.prototype.clearTimeout = function(){
  */
 
 Request.prototype.timeoutError = function(){
-	var time = this._timeout
-	var err = new Error('timeout of ' + time + 'ms exceeded')
-	err.timeout = time
-	this.response.error(err)
+  var time = this._timeout
+  var err = new Error('timeout of ' + time + 'ms exceeded')
+  err.timeout = time
+  this.response.error(err)
 }
 
 /**
@@ -263,12 +263,12 @@ Request.prototype.timeoutError = function(){
  */
 
 Request.prototype.abort = function(){
-	if (this.aborted) return
-	this.aborted = true
-	this.request.abort()
-	this.clearTimeout()
-	this.emit('abort')
-	return this
+  if (this.aborted) return
+  this.aborted = true
+  this.request.abort()
+  this.clearTimeout()
+  this.emit('abort')
+  return this
 }
 
 /**
@@ -282,9 +282,9 @@ Request.prototype.abort = function(){
  */
 
 Request.prototype.agent = function(agent){
-	if (!arguments.length) return this.options.agent
-	this.options.agent = agent
-	return this
+  if (!arguments.length) return this.options.agent
+  this.options.agent = agent
+  return this
 }
 
 /**
@@ -329,28 +329,28 @@ Request.prototype.agent = function(agent){
  */
 
 Request.prototype.send = function(data){
-	var type = this.header['Content-Type']
+  var type = this.header['Content-Type']
 
-	if (typeof data == 'object') {
-		this._data = merge(this._data || {}, data)
-		if (!type) this.type('json')
-		return this
-	}
+  if (typeof data == 'object') {
+    this._data = merge(this._data || {}, data)
+    if (!type) this.type('json')
+    return this
+  }
 
-	if (typeof data == 'string') {
-		if (!type) this.type('form')
-		type = this.header['Content-Type']
+  if (typeof data == 'string') {
+    if (!type) this.type('form')
+    type = this.header['Content-Type']
 
-		if (type == 'application/x-www-form-urlencoded') {
-			this._data = this._data
-				? this._data + '&' + data
-				: data
-		} else {
-			this._data = (this._data || '') + data
-		}
-	}
+    if (type == 'application/x-www-form-urlencoded') {
+      this._data = this._data
+        ? this._data + '&' + data
+        : data
+    } else {
+      this._data = (this._data || '') + data
+    }
+  }
 
-	return this
+  return this
 }
 
 /**
@@ -363,7 +363,7 @@ Request.prototype.send = function(data){
  */
 
 Request.prototype.auth = function(user, pass){
-	return this.set('Authorization', 'Basic ' + base64(user + ':' + pass))
+  return this.set('Authorization', 'Basic ' + base64(user + ':' + pass))
 }
 
 /**
@@ -379,12 +379,12 @@ Request.prototype.auth = function(user, pass){
  */
 
 Request.prototype.path = function(){
-	var path = join.apply(null, arguments)
-	this.options.pathname =
-	this.options.path = !(/^\//).test(path)
-		? '/' + path
-		: path
-	return this
+  var path = join.apply(null, arguments)
+  this.options.pathname =
+  this.options.path = !(/^\//).test(path)
+    ? '/' + path
+    : path
+  return this
 }
 
 /**
@@ -396,15 +396,15 @@ Request.prototype.path = function(){
  */
 
 function sugar(res){
-	var type = res.headers['content-type'] || ''
-	res.header = res.headers
-	merge(res, params(type))
-	res.type = type.split(/ *; */)[0]
-	res.statusType = res.status / 100 | 0
-	res.message = statusCodes[res.status]
-	var link = res.headers['link']
-	if (link) res.links = parseLinks(link)
-	return res
+  var type = res.headers['content-type'] || ''
+  res.header = res.headers
+  merge(res, params(type))
+  res.type = type.split(/ *; */)[0]
+  res.statusType = res.status / 100 | 0
+  res.message = statusCodes[res.status]
+  var link = res.headers['link']
+  if (link) res.links = parseLinks(link)
+  return res
 }
 
 /**
@@ -416,13 +416,13 @@ function sugar(res){
  */
 
 function params(str){
-	return str.split(/ *; */).reduce(function(obj, str){
-		var parts = str.split(/ *= */)
-		var key = parts.shift()
-		var val = parts.shift()
-		if (key && val) obj[key] = val
-		return obj
-	}, {})
+  return str.split(/ *; */).reduce(function(obj, str){
+    var parts = str.split(/ *= */)
+    var key = parts.shift()
+    var val = parts.shift()
+    if (key && val) obj[key] = val
+    return obj
+  }, {})
 }
 
 /**
@@ -434,11 +434,11 @@ function params(str){
  */
 
 function parseLinks(str){
-	return str.split(/ *, */).reduce(function(obj, str){
-		var parts = str.split(/ *; */)
-		var url = parts[0].slice(1, -1)
-		var rel = parts[1].split(/ *= */)[1].slice(1, -1)
-		obj[rel] = url
-		return obj
-	}, {})
+  return str.split(/ *, */).reduce(function(obj, str){
+    var parts = str.split(/ *; */)
+    var url = parts[0].slice(1, -1)
+    var rel = parts[1].split(/ *= */)[1].slice(1, -1)
+    obj[rel] = url
+    return obj
+  }, {})
 }

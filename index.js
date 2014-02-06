@@ -1,4 +1,4 @@
 // client or server?
 module.exports = typeof window == 'undefined'
-	? require('./node')
-	: require('./client')
+  ? require('./node')
+  : require('./client')

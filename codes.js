@@ -56,5 +56,5 @@
 510: Not Extended\
 511: Network Authentication Required'
 .match(/\d{3}[^\d]+/g).forEach(function(line){
-	exports[line.slice(0, 3)] = line.slice(5)
+  exports[line.slice(0, 3)] = line.slice(5)
 })

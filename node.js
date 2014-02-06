@@ -15,8 +15,8 @@ module.exports = exports = Request
  */
 
 exports.protocols = {
-	'http:': require('http').request,
-	'https:': require('https').request
+  'http:': require('http').request,
+  'https:': require('https').request
 }
 
 /**
@@ -28,24 +28,24 @@ exports.protocols = {
  */
 
 methods.forEach(function(method){
-	exports[method] = function(url){
-		if (typeof url == 'string') {
-			if (url.indexOf('http') !== 0) url = 'http://' + url
-			url = parse(url, true)
-		}
-		url.method = method
-		url.agent = false
-		if (!url.hostname) url.hostname = 'localhost'
-		return new Request(url).set('user-agent', userAgent)
-	}
-	method = method.toUpperCase()
+  exports[method] = function(url){
+    if (typeof url == 'string') {
+      if (url.indexOf('http') !== 0) url = 'http://' + url
+      url = parse(url, true)
+    }
+    url.method = method
+    url.agent = false
+    if (!url.hostname) url.hostname = 'localhost'
+    return new Request(url).set('user-agent', userAgent)
+  }
+  method = method.toUpperCase()
 })
 
 var userAgent = [
-	process.title,
-	process.version,
-	process.platform,
-	process.arch
+  process.title,
+  process.version,
+  process.platform,
+  process.arch
 ].join(' ')
 
 /**
@@ -58,17 +58,17 @@ var userAgent = [
  */
 
 Request.prototype.serializeData = function(){
-	var data = this._data
-	if (data) {
-		if (typeof data != 'string') {
-			var fn = exports.serialize[this.header['Content-Type']]
-			if (fn) data = fn(data)
-		}
-		if (typeof data == 'string' && !('Content-Length' in this.header)) {
-			this.set('Content-Length', Buffer.byteLength(data))
-		}
-		return data
-	}
+  var data = this._data
+  if (data) {
+    if (typeof data != 'string') {
+      var fn = exports.serialize[this.header['Content-Type']]
+      if (fn) data = fn(data)
+    }
+    if (typeof data == 'string' && !('Content-Length' in this.header)) {
+      this.set('Content-Length', Buffer.byteLength(data))
+    }
+    return data
+  }
 }
 
 /**
@@ -79,11 +79,11 @@ Request.prototype.serializeData = function(){
  */
 
 lazy(Request.prototype, 'request', function(){
-	var url = this.options
-	var query = url.query = qs.stringify(url.query)
-	if (query) url.path = url.pathname + '?' + query
-	url.headers = this.header
-	return exports.protocols[url.protocol](url)
+  var url = this.options
+  var query = url.query = qs.stringify(url.query)
+  if (query) url.path = url.pathname + '?' + query
+  url.headers = this.header
+  return exports.protocols[url.protocol](url)
 })
 
 /**
@@ -95,24 +95,24 @@ lazy(Request.prototype, 'request', function(){
  */
 
 Request.prototype.onNeed = function(){
-	var self = this
-	return this.response.then(function(res){
-		if (res.statusType > 2) throw res
-		var result = new Result
+  var self = this
+  return this.response.then(function(res){
+    if (res.statusType > 2) throw res
+    var result = new Result
 
-		res.text = '' // TODO: support binary
-		res.on('data', function(data){
-			this.text += data || ''
-		}).on('end', function(){
-			var parse = self._parser || exports.parse[res.type]
-			self.write = Result.prototype.write // HACK
-			result.write(parse ? parse(res.text) : res.text)
-		}).on('error', function(e){
-			result.error(e)
-		})
+    res.text = '' // TODO: support binary
+    res.on('data', function(data){
+      this.text += data || ''
+    }).on('end', function(){
+      var parse = self._parser || exports.parse[res.type]
+      self.write = Result.prototype.write // HACK
+      result.write(parse ? parse(res.text) : res.text)
+    }).on('error', function(e){
+      result.error(e)
+    })
 
-		return result
-	})
+    return result
+  })
 }
 
 /**
@@ -123,64 +123,64 @@ Request.prototype.onNeed = function(){
  */
 
 lazy(Request.prototype, 'response', function(){
-	var result = new Result
-	var data = this.serializeData()
-	var url = this.options
-	var self = this
+  var result = new Result
+  var data = this.serializeData()
+  var url = this.options
+  var self = this
 
-	this.request
-		.on('response', onResponse)
-		.on('error', onError)
+  this.request
+    .on('response', onResponse)
+    .on('error', onError)
 
-	if (!this.pipedTo) this.end(data)
+  if (!this.pipedTo) this.end(data)
 
-	function onResponse(res){
-		if (isRedirect(res.statusCode)) {
-			// ensure the response is being consumed
-			// this is required for Node v0.10+
-			res.resume()
-			self.emit('redirect', res)
+  function onResponse(res){
+    if (isRedirect(res.statusCode)) {
+      // ensure the response is being consumed
+      // this is required for Node v0.10+
+      res.resume()
+      self.emit('redirect', res)
 
-			if (url.method != 'HEAD' && url.method != 'GET') {
-				return onError(new Error('cant redirect a ' + url.method))
-			}
+      if (url.method != 'HEAD' && url.method != 'GET') {
+        return onError(new Error('cant redirect a ' + url.method))
+      }
 
-			if (self.redirects.length >= self._maxRedirects) {
-				return onError(sugar(res))
-			}
+      if (self.redirects.length >= self._maxRedirects) {
+        return onError(sugar(res))
+      }
 
-			url = redirection(url, res.headers.location)
-			self.redirects.push(url.href)
+      url = redirection(url, res.headers.location)
+      self.redirects.push(url.href)
 
-			exports.protocols[url.protocol](url)
-				.on('response', onResponse)
-				.on('error', onError)
-				.end()
-		} else {
-			var stream = res
-			// inflate
-			if (/^(deflate|gzip)$/.test(res.headers['content-encoding'])) {
-				stream = res.pipe(zlib.createUnzip())
-				stream.statusCode = res.statusCode
-				stream.headers = res.headers
-			}
-			self.clearTimeout()
-			self.res = sugar(stream)
-			result.write(stream)
-		}
-	}
+      exports.protocols[url.protocol](url)
+        .on('response', onResponse)
+        .on('error', onError)
+        .end()
+    } else {
+      var stream = res
+      // inflate
+      if (/^(deflate|gzip)$/.test(res.headers['content-encoding'])) {
+        stream = res.pipe(zlib.createUnzip())
+        stream.statusCode = res.statusCode
+        stream.headers = res.headers
+      }
+      self.clearTimeout()
+      self.res = sugar(stream)
+      result.write(stream)
+    }
+  }
 
-	function onError(e){
-		self.clearTimeout()
-		if (!self.aborted) self.error(e)
-	}
+  function onError(e){
+    self.clearTimeout()
+    if (!self.aborted) self.error(e)
+  }
 
-	return result
+  return result
 })
 
 function sugar(res){
-	res.status = res.statusCode
-	return exports.sugar(res)
+  res.status = res.statusCode
+  return exports.sugar(res)
 }
 
 /**
@@ -193,7 +193,7 @@ function sugar(res){
  */
 
 Request.prototype.write = function(data, encoding){
-	return this.request.write(data, encoding)
+  return this.request.write(data, encoding)
 }
 
 /**
@@ -206,9 +206,9 @@ Request.prototype.write = function(data, encoding){
  */
 
 Request.prototype.end = function(data, encoding){
-	this.startTimer()
-	this.request.end(data, encoding)
-	return this
+  this.startTimer()
+  this.request.end(data, encoding)
+  return this
 }
 
 /**
@@ -221,10 +221,10 @@ Request.prototype.end = function(data, encoding){
  */
 
 Request.prototype.pipe = function(stream, options){
-	this.response.read(function(res){
-		res.pipe(stream, options)
-	})
-	return stream
+  this.response.read(function(res){
+    res.pipe(stream, options)
+  })
+  return stream
 }
 
 /**
@@ -237,18 +237,18 @@ Request.prototype.pipe = function(stream, options){
  */
 
 function redirection(url, link){
-	// relative path
-	if (link.indexOf('://') < 0) {
-		if (link.indexOf('//') !== 0) {
-			link = '//' + url.host + link
-		}
-		link = url.protocol + link
-	}
-	link = parse(link)
-	link.method = 'GET'
-	link.agent = url.agent
-	link.headers = url.headers
-	return link
+  // relative path
+  if (link.indexOf('://') < 0) {
+    if (link.indexOf('//') !== 0) {
+      link = '//' + url.host + link
+    }
+    link = url.protocol + link
+  }
+  link = parse(link)
+  link.method = 'GET'
+  link.agent = url.agent
+  link.headers = url.headers
+  return link
 }
 
 /**
@@ -260,5 +260,5 @@ function redirection(url, link){
  */
 
 function isRedirect(code) {
-	return [301, 302, 303, 305, 307].indexOf(code) >= 0
+  return [301, 302, 303, 305, 307].indexOf(code) >= 0
 }
