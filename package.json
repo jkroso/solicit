@@ -5,7 +5,6 @@
   "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
     "base64-encode": "ForbesLindesay/base64-encode#1.0.1",
-    "inherit": "nathan7/inherit#f1a75b4",
     "emitter": "jkroso/Emitter#0.10.0",
     "merge": "yields/merge#2f357cb",
     "mime": "component/mime#0.0.1",

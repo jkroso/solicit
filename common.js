@@ -1,10 +1,9 @@
 
-var Deferred = require('result/defer')
 var base64 = require('base64-encode')
 var setter = require('setter-method')
 var statusCodes = require('./codes')
+var defer = require('result/defer')
 var lazy = require('lazy-property')
-var inherit = require('inherit')
 var Emitter = require('emitter')
 var join = require('path/join')
 var merge = require('merge')
@@ -72,7 +71,7 @@ function Request(options){
  * inherit from Deferred
  */
 
-inherit(Request, Deferred)
+Request.prototype = new defer.Deferred
 
 /**
  * mixin Emitter
