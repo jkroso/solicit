@@ -13,7 +13,6 @@
     "xhr": "yields/xhr#1.0.0",
     "setter-method": "~0.1.0",
     "lazy-property": "~0.0.2",
-    "result-type": "1.0.0",
     "methods": "0.0.1",
     "result": "~1.0.0",
     "qs": "~0.6.5"
