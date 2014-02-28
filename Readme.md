@@ -1,13 +1,15 @@
 
 # solicit
 
-  a declarative http client based of [superagent](//github.com/visionmedia/superagent). Versions available for both the browser and node with the same API and shared test suite. Usable now but still a WIP. A little bit experimental also so API is unstable.
+A declarative http client based off [superagent](//github.com/visionmedia/superagent). Versions available for both the browser and node with the same API and shared test suite.
 
 ## Installation
 
-_With [packin](//github.com/jkroso/packin) or [component](//github.com/component/component)_
+With your favorite package manager:
 
-	$ packin add jkroso/solicit
+- [packin](//github.com/jkroso/packin): `packin add solicit`
+- [component](//github.com/component/component#installing-packages): `component install jkroso/solicit`
+- [npm](//npmjs.org/doc/cli/npm-install.html): `npm install solicit`
 
 then in your app:
 
@@ -46,7 +48,6 @@ request.get('/')
   .read(callback)
 ```
 
-
 ```js
 request.get('/')
   .set({ Accept: 'application/json', 'X-API-Key': 'foobar' })
@@ -80,7 +81,6 @@ request.post('/')
   .send(jsonstring)
   .read(callback)
 ```
-
 
 ```js
 request.post('/')
@@ -127,14 +127,12 @@ request.post('/user')
   .read(callback)
 ```
 
-
 ```js
 // auto json
 request.post('/user')
   .send({ name: 'tj' })
   .read(callback)
 ```
-
 
 ```js
 // manual x-www-form-urlencoded
@@ -144,7 +142,6 @@ request.post('/user')
   .read(callback)
 ```
 
-
 ```js
 // auto x-www-form-urlencoded
 request.post('/user')
@@ -152,7 +149,6 @@ request.post('/user')
   .send({ name: 'tj' })
   .read(callback)
 ```
-
 
 ```js
 // string defaults to x-www-form-urlencoded
@@ -192,7 +188,3 @@ get('https://api.github.com')
 ### Request.pipe(stream, options)
 
   Pipe the request body to `stream`
-
-## Running the tests
-
-Just run `make` and navigate your browser to [test/index.html](test/index.html).
