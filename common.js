@@ -48,7 +48,6 @@ exports.parse = {
   'application/x-www-form-urlencoded': qs.parse
 }
 
-
 /**
  * the Request class
  *

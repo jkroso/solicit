@@ -101,8 +101,8 @@ Request.prototype.onNeed = function(){
     var result = new Result
 
     res.text = '' // TODO: support binary
-    res.on('data', function(data){
-      this.text += data || ''
+    res.on('readable', function(){
+      this.text += this.read() || ''
     }).on('end', function(){
       var parse = self._parser || exports.parse[res.type]
       self.write = Result.prototype.write // HACK
