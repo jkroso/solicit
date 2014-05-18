@@ -4,7 +4,6 @@ var Request = require('./common')
 var parse = require('url').parse
 var methods = require('methods')
 var Result = require('result')
-var merge = require('merge')
 var zlib = require('zlib')
 var qs = require('qs')
 

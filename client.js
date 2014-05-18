@@ -4,7 +4,6 @@ var format = require('url').format
 var Request = require('./common')
 var parse = require('url').parse
 var Result = require('result')
-var merge = require('merge')
 var getXHR = require('xhr')
 var type = require('type')
 var qs = require('qs')
