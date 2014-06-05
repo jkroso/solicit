@@ -1,11 +1,10 @@
 
-var express = require('express')
 var request = require('..')
 var fs = require('fs')
 
-var app = express()
+var app = require('express')()
 
-app.use(express.json())
+app.use(require('body-parser').json())
 
 app.post('/', function(req, res){
   res.send(req.body)

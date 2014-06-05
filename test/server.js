@@ -7,7 +7,7 @@ var app = express()
 
 // request logging
 // app.use(express.logger('dev'))
-app.use(express.errorHandler())
+app.use(require('errorhandler')())
 
 // allow cross-origin
 // app.use(function(req, res, next){
@@ -59,7 +59,7 @@ app.get('/query', function(req, res){
   res.send(req.query)
 })
 
-app.del('/query', function(req, res){
+app.delete('/query', function(req, res){
   res.send(req.query)
 })
 
@@ -73,6 +73,14 @@ app.post('/movie', function(req, res){
 
 app.get('/movies/all', function(req, res){
   res.redirect('/movies/all/0')
+})
+
+app.get('/loop/1', function(req, res){
+  res.redirect('/loop/2')
+})
+
+app.get('/loop/2', function(req, res){
+  res.redirect('/loop/1')
 })
 
 app.get('/movies/all/0', function(req, res){
@@ -143,7 +151,7 @@ var auth = express()
 
 app.use('/auth', auth)
 
-auth.use(express.basicAuth('tobi', 'learnboost'))
+auth.use(require('basic-auth-connect')('tobi', 'learnboost'))
 
 auth.get('/', function(req, res){
   res.end('you win!')
@@ -151,17 +159,18 @@ auth.get('/', function(req, res){
 
 // compile javascript and html
 app.use(require('serve-js')(path.dirname(__dirname)))
+
+// render Readme
 app.use(require('markdown-middleware')({
   directory: path.dirname(__dirname)
 }))
 
+var dir = path.dirname(__dirname)
+
 // static files
-app.use(express.static(path.dirname(__dirname), { hidden: false }))
+app.use(require('serve-static')(dir, { hidden: false }))
 
 // directory serving
-app.use(express.directory(path.dirname(__dirname), {
-  hidden: false,
-  icons: true
-}))
+app.use(require('serve-index')(dir, {icons: true}))
 
 app.listen(5000)
