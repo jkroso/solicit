@@ -1,5 +1,6 @@
 
 var request = require('..')
+var get = request.get
 
 describe('on redirect', function(){
   it('should emit a "redirect" event', function(done){
@@ -28,6 +29,13 @@ describe('on redirect', function(){
         'http://localhost:5000/movies/all/0'
       ])
       res.should.equal('first movie page')
+      done()
+    })
+  })
+
+  it('should detect redirect loops', function(done){
+    get('http://localhost:5000/loop/1').read(null, function(e){
+      e.message.should.match(/redirect loop/i)
       done()
     })
   })

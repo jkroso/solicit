@@ -149,6 +149,15 @@ lazy(Request.prototype, 'response', function(){
       }
 
       url = redirection(url, res.headers.location)
+
+      var isLoop = self.redirects.some(function(href){
+        return url.href == href
+      })
+
+      if (isLoop) {
+        return onError(new Error('infinite redirect loop detected'))
+      }
+
       self.redirects.push(url.href)
 
       exports.protocols[url.protocol](url)
