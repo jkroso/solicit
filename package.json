@@ -12,7 +12,7 @@
     "merge": "yields/merge",
     "setter-method": "0",
     "lazy-property": "0",
-    "base64-encode": "2",
+    "base64-encode": "1",
     "methods": "0.0.1",
     "result": "1",
     "qs": "2"
