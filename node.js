@@ -4,6 +4,7 @@ var Request = require('./common')
 var parse = require('url').parse
 var methods = require('methods')
 var Result = require('result')
+var merge = require('merge')
 var zlib = require('zlib')
 var qs = require('qs')
 
@@ -33,8 +34,6 @@ methods.forEach(function(method){
       url = parse(url, true)
     }
     url.method = method
-    url.agent = false
-    if (!url.hostname) url.hostname = 'localhost'
     return new Request(url).set('user-agent', userAgent)
   }
   method = method.toUpperCase()
@@ -79,10 +78,15 @@ Request.prototype.serializeData = function(){
 
 lazy(Request.prototype, 'request', function(){
   var url = this.options
-  var query = url.query = qs.stringify(url.query)
-  if (query) url.path = url.pathname + '?' + query
-  url.headers = this.header
-  return exports.protocols[url.protocol](url)
+  var query = qs.stringify(url.query)
+  return exports.protocols[url.protocol]({
+    path: query ? (url.pathname + '?' + query) : url.pathname,
+    headers: merge({}, this.header),
+    method: url.method,
+    host: url.hostname || 'localhost',
+    port: url.port,
+    agent: false
+  })
 })
 
 /**
@@ -149,6 +153,7 @@ lazy(Request.prototype, 'response', function(){
       }
 
       url = redirection(url, res.headers.location)
+      url.headers = self.header
 
       var isLoop = self.redirects.some(function(href){
         return url.href == href
@@ -254,8 +259,6 @@ function redirection(url, link){
   }
   link = parse(link)
   link.method = 'GET'
-  link.agent = url.agent
-  link.headers = url.headers
   return link
 }
 
