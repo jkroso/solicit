@@ -1,9 +1,10 @@
 {
   "name": "solicit",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "a declarative http client for node and browser",
   "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
+    "base64-encode": "ForbesLindesay/base64-encode",
     "emitter": "jkroso/Emitter#0.10.0",
     "mime": "component/mime#0.0.1",
     "type": "jkroso/type#1.0.2",
@@ -12,7 +13,6 @@
     "merge": "yields/merge",
     "setter-method": "0",
     "lazy-property": "0",
-    "base64-encode": "1",
     "methods": "0.0.1",
     "result": "1",
     "qs": "2"
