@@ -8,7 +8,7 @@
 module.exports = function(hydro) {
   hydro.set({
     suite: 'solicit',
-    timeout: 500,
+    timeout: 1000,
     plugins: [
       require('hydro-chai'),
       require('hydro-bdd')
