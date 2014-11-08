@@ -103,7 +103,7 @@ app.get('/custom', function(req, res){
 })
 
 app.get('/error', function(req, res){
-  res.send(500, 'boom')
+  res.status(500).send('boom')
 })
 
 app.get('/timeout/:ms', function(req, res){
@@ -119,7 +119,7 @@ app.get('/tobi', function(req, res){
 
 app.get('/relative', function(req, res){
   res.set('Location', '/tobi')
-  res.send(302)
+  res.status(302).send()
 })
 
 app.get('/header', function(req, res){
@@ -168,7 +168,7 @@ app.use(require('markdown-middleware')({
 var dir = path.dirname(__dirname)
 
 // static files
-app.use(require('serve-static')(dir, { hidden: false }))
+app.use(require('serve-static')(dir, { dotfiles: 'ignore' }))
 
 // directory serving
 app.use(require('serve-index')(dir, {icons: true}))
