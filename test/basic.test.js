@@ -342,16 +342,6 @@ describe('req.query(Object)', function(){
     })
   })
 
-  it('should not error on dates', function(done){
-    request
-    .delete('http://localhost:5000/query')
-    .query({ at: new Date(0) })
-    .read(function(res){
-      assert(String(new Date(0)) == res.at)
-      done()
-    })
-  })
-
   it('should work after setting header fields', function(done){
     request
     .delete('http://localhost:5000/query')

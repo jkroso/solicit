@@ -38,7 +38,7 @@ describe('req.send(Object) as "form"', function(){
           age: '1'
         })
         this.res.header['content-type'].should.equal('application/x-www-form-urlencoded')
-        this.res.text.should.equal('name[first]=tobi&name[last]=holowaychuk&age=1')
+        this.res.text.should.equal(encodeURI('name[first]=tobi&name[last]=holowaychuk&age=1'))
         done()
       })
     })
