@@ -437,3 +437,20 @@ describe('Basic auth', function(){
     })
   })
 })
+
+describe('.clone()', function(){
+  var proto = get('http://localhost:5000')
+  it('1', function(done){
+    proto.clone().path('/movies/all/0').read(function(res){
+      res.should.equal( 'first movie page')
+      done()
+    })
+  })
+
+  it('2', function(done){
+    proto.clone().path('/login').read(function(res){
+      res.should.equal('<form id="login"></form>')
+      done()
+    })
+  })
+})

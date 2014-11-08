@@ -386,6 +386,24 @@ Request.prototype.path = function(){
 }
 
 /**
+ * Clone the Request. This provides an efficient way to create
+ * several similar requests:
+ *
+ *   var gh = request.get('https://api.github.com').auth(username, password)
+ *   gh.clone().path('repos/jkroso/solicit/tags').read(callback)
+ *   gh.clone().path('repos/tj/superagent/tags').read(callback)
+ *
+ * @return {Request}
+ */
+
+Request.prototype.clone = function(){
+  var clone = Object.create(this)
+  clone.header = Object.create(this.header)
+  clone.options = Object.create(this.options)
+  return clone
+}
+
+/**
  * add sugar to the response
  *
  * @param {IncomingMessage} res
