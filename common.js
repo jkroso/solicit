@@ -369,10 +369,7 @@ Request.prototype.auth = function(user, pass){
 
 Request.prototype.path = function(){
   var path = join.apply(null, arguments)
-  this.options.pathname =
-  this.options.path = !(/^\//).test(path)
-    ? '/' + path
-    : path
+  this.options.pathname = path.replace(/^\/?/, '/')
   return this
 }
 
