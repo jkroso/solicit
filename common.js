@@ -40,15 +40,6 @@ exports.serialize = {
 }
 
 /**
- * default parsers
- */
-
-exports.parse = {
-  'application/json': JSON.parse,
-  'application/x-www-form-urlencoded': qs.parse
-}
-
-/**
  * the Request class
  *
  * @param {Object} options

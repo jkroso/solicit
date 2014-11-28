@@ -1,4 +1,5 @@
 
+var parsemime = require('parse-mime')
 var lazy = require('lazy-property')
 var format = require('url').format
 var Request = require('./common')
@@ -82,11 +83,7 @@ Request.prototype.onNeed = function(){
   return this.response.then(function(res){
     if (res.statusType > 2) throw res
     self.write = Result.prototype.write // HACK
-    res.text = res.response
-    var parse = self._parser || exports.parse[res.type]
-    return parse
-      ? parse(res.text)
-      : res.text
+    return parsemime(res.type, res.text)
   })
 }
 
@@ -111,6 +108,7 @@ lazy(Request.prototype, 'response', function(){
         }
         xhr.statusCode = xhr.status
         xhr.headers = parseHeader(xhr.getAllResponseHeaders())
+        xhr.text = xhr.response
         self.res = exports.sugar(xhr)
         result.write(xhr)
     }

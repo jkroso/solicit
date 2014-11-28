@@ -14,6 +14,7 @@
     "setter-method": "0",
     "lazy-property": "0",
     "methods": "0.0.1",
+    "parse-mime": "0",
     "result": "1",
     "qs": "2"
   },

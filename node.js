@@ -1,4 +1,5 @@
 
+var parsemime = require('parse-mime')
 var lazy = require('lazy-property')
 var Request = require('./common')
 var parse = require('url').parse
@@ -107,9 +108,8 @@ Request.prototype.onNeed = function(){
     res.on('readable', function(){
       this.text += this.read() || ''
     }).on('end', function(){
-      var parse = self._parser || exports.parse[res.type]
       self.write = Result.prototype.write // HACK
-      result.write(parse ? parse(res.text) : res.text)
+      result.write(parsemime(res.type, res.text))
     }).on('error', function(e){
       result.error(e)
     })
