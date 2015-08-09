@@ -28,7 +28,7 @@ var mime = [
 ].reduce(function(types, mime){
   types[mime] = 'application/x-www-form-urlencoded'
   return types
-}, Object.create(require('mime/types')))
+}, Object.create(require('mime-component/types')))
 
 /**
  * default serializers

@@ -1,12 +1,12 @@
 {
   "name": "solicit",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "a declarative http client for node and browser",
   "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
     "base64-encode": "ForbesLindesay/base64-encode",
+    "mime-component": "component/mime#0.0.2",
     "emitter": "jkroso/Emitter#0.10.0",
-    "mime": "component/mime#0.0.2",
     "type": "jkroso/type#1.1.0",
     "path": "jkroso/path#1.1.0",
     "xhr": "yields/xhr#1.0.0",

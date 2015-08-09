@@ -1,4 +1,3 @@
-
 var parsemime = require('parse-mime')
 var lazy = require('lazy-property')
 var Request = require('./common')
@@ -80,8 +79,9 @@ Request.prototype.serializeData = function(){
 lazy(Request.prototype, 'request', function(){
   var url = this.options
   var query = qs.stringify(url.query)
+  var path = encodeURI(url.pathname)
   return exports.protocols[url.protocol]({
-    path: query ? (url.pathname + '?' + query) : url.pathname,
+    path: query ? (path + '?' + query) : path,
     headers: merge({}, this.header),
     method: url.method,
     host: url.hostname || 'localhost',
@@ -109,7 +109,11 @@ Request.prototype.onNeed = function(){
       this.text += this.read() || ''
     }).on('end', function(){
       self.write = Result.prototype.write // HACK
-      result.write(parsemime(res.type, res.text))
+      try {
+        result.write(parsemime(res.type, res.text))
+      } catch (e) {
+        result.error(e)
+      }
     }).on('error', function(e){
       result.error(e)
     })
