@@ -1,22 +1,22 @@
 {
   "name": "solicit",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "a declarative http client for node and browser",
   "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
     "base64-encode": "ForbesLindesay/base64-encode",
     "emitter": "jkroso/Emitter#0.10.0",
-    "mime": "component/mime#0.0.1",
-    "type": "jkroso/type#1.0.2",
+    "mime": "component/mime#0.0.2",
+    "type": "jkroso/type#1.1.0",
     "path": "jkroso/path#1.1.0",
     "xhr": "yields/xhr#1.0.0",
     "merge": "yields/merge",
     "setter-method": "0",
     "lazy-property": "0",
-    "methods": "0.0.1",
+    "methods": "1.1.1",
     "parse-mime": "0",
     "result": "1",
-    "qs": "2"
+    "qs": "4"
   },
   "devDependencies": {
     "markdown-middleware": "~0.1.3",
@@ -24,7 +24,6 @@
     "reduce": "jkroso/reduce",
     "basic-auth-connect": "*",
     "url-to-screenshot": "*",
-    "serve-js": "~0.5.2",
     "express": "^4.4.1",
     "serve-static": "*",
     "errorhandler": "*",
@@ -35,6 +34,7 @@
     "hydro-chai": "*",
     "hydro-dot": "*",
     "hydro-bdd": "*",
+    "serve-js": "0",
     "hydro": "*",
     "chai": "*"
   },
@@ -46,5 +46,6 @@
     "index.js",
     "codes.js",
     "node.js"
-  ]
+  ],
+  "license": "MIT"
 }

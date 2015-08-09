@@ -2,7 +2,7 @@ serve: node_modules test/pid
 	open http://localhost:5000/test/index.html
 
 test/pid:
-	@node test/server.js & echo $$! > test/pid
+	@node --harmony test/server.js & echo $$! > test/pid
 	@sleep 1 # server needs time to boot
 
 kill:
