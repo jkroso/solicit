@@ -1,20 +1,16 @@
-var parsemime = require('parse-mime')
-var lazy = require('lazy-property')
-var Request = require('./common')
-var parse = require('url').parse
-var methods = require('methods')
-var Result = require('result')
-var merge = require('merge')
-var zlib = require('zlib')
-var qs = require('qs')
-
-module.exports = exports = Request
+import Request, {serialize, sugar as commonSugar} from './common'
+import parsemime from 'parse-mime'
+import lazy from 'lazy-property'
+import Result from 'result'
+import {parse} from 'url'
+import zlib from 'zlib'
+import qs from 'qs'
 
 /**
  * default protocols
  */
 
-exports.protocols = {
+export const protocols = {
   'http:': require('http').request,
   'https:': require('https').request
 }
@@ -27,24 +23,23 @@ exports.protocols = {
  * @api public
  */
 
-methods.forEach(function(method){
-  exports[method] = function(url){
-    if (typeof url == 'string') {
-      if (url.indexOf('http') !== 0) url = 'http://' + url
-      url = parse(url, true)
-    }
-    url.method = method
-    return new Request(url).set('user-agent', userAgent)
+const createRequest = method => url => {
+  if (typeof url == 'string') {
+    if (url.indexOf('http') !== 0) url = 'http://' + url
+    url = parse(url, true)
   }
-  method = method.toUpperCase()
-})
+  url.method = method
+  return new Request(url).set('user-agent', userAgent)
+}
 
-var userAgent = [
-  process.title,
-  process.version,
-  process.platform,
-  process.arch
-].join(' ')
+export const patch = createRequest('PATCH')
+export const del = createRequest('DELETE')
+export const head = createRequest('HEAD')
+export const post = createRequest('POST')
+export const get = createRequest('GET')
+export const put = createRequest('PUT')
+
+const userAgent = `${process.title} ${process.version} ${process.platform} ${process.arch}`
 
 /**
  * translate `this._data` to a string so it can
@@ -59,7 +54,7 @@ Request.prototype.serializeData = function(){
   var data = this._data
   if (data) {
     if (typeof data != 'string') {
-      var fn = exports.serialize[this.header['Content-Type']]
+      var fn = serialize[this.header['Content-Type']]
       if (fn) data = fn(data)
     }
     if (typeof data == 'string' && !('Content-Length' in this.header)) {
@@ -77,12 +72,12 @@ Request.prototype.serializeData = function(){
  */
 
 lazy(Request.prototype, 'request', function(){
-  var url = this.options
-  var query = qs.stringify(url.query)
-  var path = encodeURI(url.pathname)
-  return exports.protocols[url.protocol]({
+  const url = this.options
+  const query = qs.stringify(url.query)
+  const path = encodeURI(url.pathname)
+  return protocols[url.protocol]({
     path: query ? (path + '?' + query) : path,
-    headers: merge({}, this.header),
+    headers: Object.assign({}, this.header),
     method: url.method,
     host: url.hostname || 'localhost',
     port: url.port,
@@ -99,25 +94,20 @@ lazy(Request.prototype, 'request', function(){
  */
 
 Request.prototype.onNeed = function(){
-  var self = this
-  return this.response.then(function(res){
+  return this.response.then(res => {
     if (res.statusType > 2) throw res
-    var result = new Result
-
+    const result = new Result('pending')
     res.text = '' // TODO: support binary
-    res.on('readable', function(){
-      this.text += this.read() || ''
-    }).on('end', function(){
-      self.write = Result.prototype.write // HACK
-      try {
-        result.write(parsemime(res.type, res.text))
-      } catch (e) {
-        result.error(e)
-      }
-    }).on('error', function(e){
-      result.error(e)
-    })
-
+    res.on('readable', () => res.text += res.read() || '')
+       .on('end', () => {
+         this.write = Result.prototype.write // HACK
+         try {
+           result.write(parsemime(res.type, res.text))
+         } catch (e) {
+           result.error(e)
+         }
+       })
+       .on('error', e => result.error(e))
     return result
   })
 }
@@ -130,36 +120,29 @@ Request.prototype.onNeed = function(){
  */
 
 lazy(Request.prototype, 'response', function(){
-  var result = new Result
-  var data = this.serializeData()
+  const result = new Result('pending')
+  const data = this.serializeData()
   var url = this.options
-  var self = this
 
-  this.request
-    .on('response', onResponse)
-    .on('error', onError)
-
-  if (!this.pipedTo) this.end(data)
-
-  function onResponse(res){
+  const onResponse = res => {
     if (isRedirect(res.statusCode)) {
       // ensure the response is being consumed
       // this is required for Node v0.10+
       res.resume()
-      self.emit('redirect', res)
+      this.emit('redirect', res)
 
       if (url.method != 'HEAD' && url.method != 'GET') {
         return onError(new Error('cant redirect a ' + url.method))
       }
 
-      if (self.redirects.length >= self._maxRedirects) {
+      if (this.redirects.length >= this._maxRedirects) {
         return onError(sugar(res))
       }
 
       url = redirection(url, res.headers.location)
-      url.headers = self.header
+      url.headers = this.header
 
-      var isLoop = self.redirects.some(function(href){
+      var isLoop = this.redirects.some(function(href){
         return url.href == href
       })
 
@@ -167,9 +150,9 @@ lazy(Request.prototype, 'response', function(){
         return onError(new Error('infinite redirect loop detected'))
       }
 
-      self.redirects.push(url.href)
+      this.redirects.push(url.href)
 
-      exports.protocols[url.protocol](url)
+      protocols[url.protocol](url)
         .on('response', onResponse)
         .on('error', onError)
         .end()
@@ -181,23 +164,29 @@ lazy(Request.prototype, 'response', function(){
         stream.statusCode = res.statusCode
         stream.headers = res.headers
       }
-      self.clearTimeout()
-      self.res = sugar(stream)
+      this.clearTimeout()
+      this.res = sugar(stream)
       result.write(stream)
     }
   }
 
-  function onError(e){
-    self.clearTimeout()
-    if (!self.aborted) self.error(e)
+  const onError = e => {
+    this.clearTimeout()
+    if (!this.aborted) this.error(e)
   }
+
+  this.request
+  .on('response', onResponse)
+  .on('error', onError)
+
+  if (!this.pipedTo) this.end(data)
 
   return result
 })
 
-function sugar(res){
+const sugar = res => {
   res.status = res.statusCode
-  return exports.sugar(res)
+  return commonSugar(res)
 }
 
 /**
@@ -253,7 +242,7 @@ Request.prototype.pipe = function(stream, options){
  * @api private
  */
 
-function redirection(url, link){
+const redirection = (url, link) => {
   // relative path
   if (link.indexOf('://') < 0) {
     if (link.indexOf('//') !== 0) {
@@ -274,6 +263,4 @@ function redirection(url, link){
  * @api private
  */
 
-function isRedirect(code) {
-  return [301, 302, 303, 305, 307].indexOf(code) >= 0
-}
+const isRedirect = code => [301, 302, 303, 305, 307].indexOf(code) >= 0

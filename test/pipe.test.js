@@ -1,6 +1,6 @@
-
-var request = require('..')
-var fs = require('fs')
+/* global after */
+import {post,get} from '..'
+import fs from 'fs'
 
 var app = require('express')()
 
@@ -16,14 +16,17 @@ app.get('/user.json', function(req, res){
 
 app.listen(3020)
 
-var fixtures = __dirname + '/fixtures'
+const fixtures = __dirname + '/fixtures'
+
+const removeTmpfile = done =>
+  fs.unlink(fixtures + '/tmp.json', () => done())
 
 describe('request pipe', function(){
   after(removeTmpfile)
 
   it('should act as a writable stream', function(done){
     fs.createReadStream(fixtures + '/user.json')
-      .pipe(request.post('localhost:3020').type('json'))
+      .pipe(post('localhost:3020').type('json'))
       .read(function(res){
         res.should.eql({ name: 'tobi' })
         done()
@@ -31,8 +34,7 @@ describe('request pipe', function(){
   })
 
   it('should act as a readable stream', function(done){
-    request
-      .get('localhost:3020/user.json')
+    get('localhost:3020/user.json')
       .pipe(fs.createWriteStream(fixtures + '/tmp.json'))
       .on('finish', function(){
         var json = fs.readFileSync(fixtures + '/tmp.json', 'utf8')
@@ -41,9 +43,3 @@ describe('request pipe', function(){
       })
   })
 })
-
-function removeTmpfile(done){
-  fs.unlink(fixtures + '/tmp.json', function(err){
-    done()
-  })
-}

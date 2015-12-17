@@ -1,26 +1,21 @@
-
 # solicit
 
 A declarative http client based off [superagent](//github.com/visionmedia/superagent). Versions available for both the browser and node with the same API and shared test suite.
 
 ## Installation
 
-With your favorite package manager:
-
-- [packin](//github.com/jkroso/packin): `packin add solicit`
-- [component](//github.com/component/component#installing-packages): `component install jkroso/solicit`
-- [npm](//npmjs.org/doc/cli/npm-install.html): `npm install solicit`
+`npm install solicit`
 
 then in your app:
 
 ```js
-var request = require('solicit')
+import {get,post,del} from 'solicit'
 ```
 
 ### Example
 
 ```js
-request.get('component.io/components/all').read(console.log) // => a whole lot of JSON
+get('component.io/components/all').read(console.log) // => a whole lot of JSON
 ```
 
 ## API
@@ -33,7 +28,7 @@ Each http verb has a corresponding helper function for making that type of reque
 - post
 - put
 - head
-- delete
+- del (`delete` is a reserved word in JS)
 
 ### Request.set(field:String|Object, val:String)
 
@@ -42,14 +37,14 @@ Each http verb has a corresponding helper function for making that type of reque
   Examples:
 
 ```js
-request.get('/')
+get('/')
   .set('Accept', 'application/json')
   .set('X-API-Key', 'foobar')
   .read(callback)
 ```
 
 ```js
-request.get('/')
+get('/')
   .set({ Accept: 'application/json', 'X-API-Key': 'foobar' })
   .read(callback)
 ```
@@ -65,7 +60,7 @@ request.get('/')
   Examples:
 
 ```js
-request.get('/shoes')
+get('/shoes')
   .query('size=10')
   .query({ color: 'blue' })
 ```
@@ -76,14 +71,14 @@ request.get('/shoes')
   be set with a shorthand string:
 
 ```js
-request.post('/')
+post('/')
   .type('application/json')
   .send(jsonstring)
   .read(callback)
 ```
 
 ```js
-request.post('/')
+post('/')
   .type('json')
   .send(jsonstring)
   .read(callback)
@@ -121,7 +116,7 @@ request.post('/')
 
 ```js
 // manual json
-request.post('/user')
+post('/user')
   .type('json')
   .send('{"name":"tj"}')
   .read(callback)
@@ -129,14 +124,14 @@ request.post('/user')
 
 ```js
 // auto json
-request.post('/user')
+post('/user')
   .send({ name: 'tj' })
   .read(callback)
 ```
 
 ```js
 // manual x-www-form-urlencoded
-request.post('/user')
+post('/user')
   .type('form')
   .send('name=tj')
   .read(callback)
@@ -144,7 +139,7 @@ request.post('/user')
 
 ```js
 // auto x-www-form-urlencoded
-request.post('/user')
+post('/user')
   .type('form')
   .send({ name: 'tj' })
   .read(callback)
@@ -152,7 +147,7 @@ request.post('/user')
 
 ```js
 // string defaults to x-www-form-urlencoded
-request.post('/user')
+post('/user')
   .send('name=tj')
   .send('foo=bar')
   .send('bar=baz')

@@ -1,9 +1,9 @@
+import screenshot from 'url-to-screenshot'
+import express from 'express'
+import Result from 'result'
+import path from 'path'
 
-var screenshot = require('url-to-screenshot')
-var express = require('express')
-var Result = require('result')
-var path = require('path')
-var app = express()
+const app = express()
 
 // request logging
 // app.use(express.logger('dev'))
@@ -28,7 +28,7 @@ app.get('/login', function(req, res){
 })
 
 // cache image
-var image = new Result
+var image = new Result('pending')
 screenshot('http://localhost:5000/').capture(function(err, img){
   if (err) image.error(err)
   else image.write(img)

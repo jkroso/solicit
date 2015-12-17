@@ -1,8 +1,5 @@
-
-var request = require('..')
-var url = require('url')
-var post = request.post
-var get = request.get
+import {get,post,del} from '..'
+import url from 'url'
 
 describe('with an object', function(){
   it('should format the url', function(done){
@@ -26,23 +23,6 @@ describe('.read()', function(){
     get('http://localhost:5000/movies').read(function(res){
       assert('first movie page' == res)
       done()
-    })
-  })
-
-  describe('context inside the callback', function(){
-    it('should be the request', function(done){
-      var req = get('http://localhost:5000/login')
-      req.read(function(){
-        assert(this === req)
-        done()
-      })
-    })
-
-    it('should provide the response object', function(done){
-      get('http://localhost:5000/login').read(function(){
-        assert('<form id="login"></form>' == this.res.text)
-        done()
-      })
     })
   })
 })
@@ -287,8 +267,7 @@ describe('.timeout(ms)', function(){
 
 describe('.query(String)', function(){
   it('should work when called once', function(done){
-    request
-    .delete('http://localhost:5000/query')
+    del('http://localhost:5000/query')
     .query('name=tobi')
     .read(function(res){
       res.should.eql({ name: 'tobi' })
@@ -297,8 +276,7 @@ describe('.query(String)', function(){
   })
 
   it('should work with url query-string', function(done){
-    request
-    .delete('http://localhost:5000/query?name=tobi')
+    del('http://localhost:5000/query?name=tobi')
     .query('age=2')
     .read(function(res){
       res.should.eql({ name: 'tobi', age: '2' })
@@ -307,8 +285,7 @@ describe('.query(String)', function(){
   })
 
   it('should work when called multiple times', function(done){
-    request
-    .delete('http://localhost:5000/query')
+    del('http://localhost:5000/query')
     .query('name=tobi')
     .query('age=2')
     .read(function(res){
@@ -318,8 +295,7 @@ describe('.query(String)', function(){
   })
 
   it('should work when mixed with objects', function(done){
-    request
-    .delete('http://localhost:5000/query')
+    del('http://localhost:5000/query')
     .query('name=tobi')
     .query({ age: 2 })
     .read(function(res){
@@ -331,8 +307,7 @@ describe('.query(String)', function(){
 
 describe('req.query(Object)', function(){
   it('should construct the query-string', function(done){
-    request
-    .delete('http://localhost:5000/query')
+    del('http://localhost:5000/query')
     .query({ name: 'tobi' })
     .query({ order: 'asc' })
     .query({ limit: ['1', '2'] })
@@ -343,8 +318,7 @@ describe('req.query(Object)', function(){
   })
 
   it('should work after setting header fields', function(done){
-    request
-    .delete('http://localhost:5000/query')
+    del('http://localhost:5000/query')
     .set('Foo', 'bar')
     .set('Bar', 'baz')
     .query({ name: 'tobi' })
@@ -357,8 +331,7 @@ describe('req.query(Object)', function(){
   })
 
   it('should append to the original query-string', function(done){
-    request
-    .delete('http://localhost:5000/query?name=tobi')
+    del('http://localhost:5000/query?name=tobi')
     .query({ order: 'asc' })
     .read(function(res) {
       res.should.eql({ name: 'tobi', order: 'asc' })
@@ -367,8 +340,7 @@ describe('req.query(Object)', function(){
   })
 
   it('should retain the original query-string', function(done){
-    request
-    .delete('http://localhost:5000/query?name=tobi')
+    del('http://localhost:5000/query?name=tobi')
     .read(function(res) {
       res.should.eql({ name: 'tobi' })
       done()

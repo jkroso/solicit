@@ -1,7 +1,4 @@
-
-var request = require('..')
-var post = request.post
-var get = request.get
+import {get,post} from '..'
 
 describe('req.send(Object) as "form"', function(){
   describe('with req.type() set to form', function(){
@@ -25,11 +22,11 @@ describe('req.send(Object) as "form"', function(){
 
   describe('when called several times', function(){
     it('should merge the objects', function(done){
-      post('http://localhost:5000/echo')
-      .type('form')
-      .send({ name: { first: 'tobi', last: 'holowaychuk' } })
-      .send({ age: '1' })
-      .read(function(body){
+      const req = post('http://localhost:5000/echo')
+                    .type('form')
+                    .send({ name: { first: 'tobi', last: 'holowaychuk' } })
+                    .send({ age: '1' })
+      req.read(function(body){
         body.should.eql({
           name: {
             first: 'tobi',
@@ -37,8 +34,8 @@ describe('req.send(Object) as "form"', function(){
           },
           age: '1'
         })
-        this.res.header['content-type'].should.equal('application/x-www-form-urlencoded')
-        this.res.text.should.equal(encodeURI('name[first]=tobi&name[last]=holowaychuk&age=1'))
+        req.res.header['content-type'].should.equal('application/x-www-form-urlencoded')
+        req.res.text.should.equal(encodeURI('name[first]=tobi&name[last]=holowaychuk&age=1'))
         done()
       })
     })

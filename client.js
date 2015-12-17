@@ -1,15 +1,12 @@
-
-var parsemime = require('parse-mime')
-var lazy = require('lazy-property')
-var format = require('url').format
-var Request = require('./common')
-var parse = require('url').parse
-var Result = require('result')
-var getXHR = require('xhr')
-var type = require('type')
-var qs = require('qs')
-
-module.exports = exports = Request
+import Request, {serialize, sugar} from './common'
+import parsemime from 'parse-mime'
+import lazy from 'lazy-property'
+import type from 'jkroso-type'
+import Result from 'result'
+import {format} from 'url'
+import {parse} from 'url'
+import getXHR from 'xhr'
+import qs from 'qs'
 
 /**
  * generate function for each HTTP verb
@@ -19,25 +16,22 @@ module.exports = exports = Request
  * @api public
  */
 
-;[
-  'get',
-  'head',
-  'put',
-  'post',
-  'patch',
-  'delete',
-].forEach(function(method){
-  exports[method] = function(url){
-    if (typeof url == 'string') url = parse(url, true)
-    if (!url.hostname) url.hostname = location.hostname
-    if (!url.protocol) url.protocol = location.protocol
-    if (!url.port) url.port = location.port
-    if (!url.host) url.host = location.host
-    url.method = method
-    return new Request(url)
-  }
-  method = method.toUpperCase()
-})
+const createRequest = method => url => {
+  if (typeof url == 'string') url = parse(url, true)
+  if (!url.hostname) url.hostname = location.hostname
+  if (!url.protocol) url.protocol = location.protocol
+  if (!url.port) url.port = location.port
+  if (!url.host) url.host = location.host
+  url.method = method
+  return new Request(url)
+}
+
+export const patch = createRequest('PATCH')
+export const del = createRequest('DELETE')
+export const head = createRequest('HEAD')
+export const post = createRequest('POST')
+export const get = createRequest('GET')
+export const put = createRequest('PUT')
 
 /**
  * default properties
@@ -49,14 +43,13 @@ Request.prototype.progress = 0
  * specialize the `set` and `type` methods
  */
 
-var _set = Request.prototype.set
+const _set = Request.prototype.set
 Request.prototype.set = function(key, value){
-  if (typeof key == 'string'
-  && key.toLowerCase() in unsafeHeaders) return this
+  if (typeof key == 'string' && key.toLowerCase() in unsafeHeaders) return this
   return _set.call(this, key, value)
 }
 
-var _type = Request.prototype.type
+const _type = Request.prototype.type
 Request.prototype.type = function(str){
   if (str == 'blob') this._responseType = str
   return _type.call(this, str)
@@ -90,33 +83,32 @@ Request.prototype.onNeed = function(){
 lazy(Request.prototype, 'request', getXHR)
 
 lazy(Request.prototype, 'response', function(){
-  var data = this.serializeData()
-  var result = new Result
-  var xhr = this.request
-  var url = this.options
-  var self = this
+  const data = this.serializeData()
+  const result = new Result('pending')
+  const xhr = this.request
+  const url = this.options
 
-  xhr.onreadystatechange = function(){
+  xhr.onreadystatechange = () => {
     switch (xhr.readyState) {
-      case 1: self.emit('open'); break
-      case 2: self.emit('sent'); break
-      case 3: self.emit('receiving'); break
+      case 1: this.emit('open'); break
+      case 2: this.emit('sent'); break
+      case 3: this.emit('receiving'); break
       case 4:
         if (!xhr.status) {
-          if (self.aborted) return self.timeoutError()
+          if (this.aborted) return this.timeoutError()
           return result.error(crossDomainError())
         }
         xhr.statusCode = xhr.status
         xhr.headers = parseHeader(xhr.getAllResponseHeaders())
         xhr.text = xhr.response
-        self.res = exports.sugar(xhr)
+        this.res = sugar(xhr)
         result.write(xhr)
     }
   }
 
-  xhr.onprogress = function(e){
-    self.progress = e.percent = e.loaded / e.total * 100
-    self.emit('progress', e)
+  xhr.onprogress = e => {
+    this.progress = e.percent = e.loaded / e.total * 100
+    this.emit('progress', e)
   }
 
   url.search = qs.stringify(url.query)
@@ -144,25 +136,24 @@ lazy(Request.prototype, 'response', function(){
  * @api private
  */
 
-function parseHeader(str) {
-  return str.trim().split(/\r?\n/).reduce(function(header, line){
-    var index = line.indexOf(':')
-    var field = line.slice(0, index).toLowerCase()
-    var val = line.slice(index + 1).trim()
+const parseHeader = str =>
+  str.trim().split(/\r?\n/).reduce((header, line) => {
+    const index = line.indexOf(':')
+    const field = line.slice(0, index).toLowerCase()
+    const val = line.slice(index + 1).trim()
     header[field] = val
     return header
   }, {})
-}
 
 Request.prototype.serializeData = function(){
-  var data = this._data
-  var url = this.options
+  const data = this._data
+  const url = this.options
   if (data
-  && url.method != 'GET'
-  && url.method != 'HEAD'
-  && typeof data != 'string'
-  && !isHost(data)) {
-    var fn = exports.serialize[this.get('Content-Type')]
+   && url.method != 'GET'
+   && url.method != 'HEAD'
+   && typeof data != 'string'
+   && !isHost(data)) {
+    var fn = serialize[this.get('Content-Type')]
     if (fn) return fn(data)
   }
   return data
@@ -177,14 +168,12 @@ Request.prototype.serializeData = function(){
  * @api private
  */
 
-function isHost(obj) {
-  return /file|blob|form\-data/.test(type(obj))
-}
+const isHost = obj => /file|blob|form\-data/.test(type(obj))
 
-function crossDomainError(){
-  var err = new Error('Origin is not allowed by Access-Control-Allow-Origin')
-  err.crossDomain = true
-  return err
+const crossDomainError = () => {
+  var error = new Error('Origin is not allowed by Access-Control-Allow-Origin')
+  error.crossDomain = true
+  return error
 }
 
 Request.prototype.write = function(s){
@@ -197,8 +186,7 @@ Request.prototype.end = function(s){
   this.response
   return this
 }
-
-var unsafeHeaders = [
+const unsafeHeaders = [
   'access-control-request-headers',
   'access-control-request-method',
   'content-transfer-encoding',
@@ -219,7 +207,7 @@ var unsafeHeaders = [
   'date',
   'host',
   'via'
-].reduce(function(obj, key){
+].reduce((obj, key) => {
   obj[key] = true
   return obj
 }, {})

@@ -1,12 +1,14 @@
+import express from 'express'
+import zlib from 'zlib'
+import {get} from '..'
 
-var app = require('express')()
-var zlib = require('zlib')
-var get = require('..').get
+const app = express()
 
-var subject = 'some long long long long string'
+const subject = 'some long long long long string'
 
 app.get('/', function(req, res, next){
   zlib.deflate(subject, function(err, buf){
+    if (err) return next(err)
     res.set('Content-Type', 'text/plain')
     res.set('Content-Encoding', 'gzip')
     res.send(buf)
@@ -18,9 +20,10 @@ app.listen(3080)
 describe('zlib', function(){
   describe('.read()', function(){
     it('should get inflated content', function(done){
-      get('http://localhost:3080').read(function(body){
+      const req = get('http://localhost:3080')
+      req.read(body => {
         body.should.equal(subject)
-        this.res.header['content-length'].should.be.below(subject.length)
+        req.res.header['content-length'].should.be.below(subject.length)
         done()
       })
     })

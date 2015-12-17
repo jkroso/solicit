@@ -1,6 +1,4 @@
-
-var request = require('..')
-var get = request.get
+import {get} from '..'
 
 describe('browser only tests', function(){
   describe('events', function(){
@@ -21,7 +19,7 @@ describe('browser only tests', function(){
   describe('type(str)', function(){
     it('should handle blobs', function(done){
       get('/image').type('blob').read(function(res){
-        res.should.be.instanceOf(Blob);
+        res.should.be.instanceOf(Blob)
         done()
       })
     })
