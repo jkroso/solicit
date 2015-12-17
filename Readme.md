@@ -20,8 +20,6 @@ get('component.io/components/all').read(console.log) // => a whole lot of JSON
 
 ## API
 
-### Solicit.[verb](http://github.com/visionmedia/node-methods)(url:String|Object)
-
 Each http verb has a corresponding helper function for making that type of request. Each function will return a `Request`. Requests are [deferred results](//github.com/jkroso/result) so you are free to configure them as much as you like with the methods mentioned below then call `read()` or `then()` to actually send the request and read the response. The main verbs you will be using are:
 
 - get
