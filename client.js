@@ -1,7 +1,7 @@
 import Request, {serialize, sugar} from './common'
 import parsemime from 'parse-mime'
 import lazy from 'lazy-property'
-import type from 'jkroso-type'
+import type from '@jkroso/type'
 import Result from 'result'
 import {format} from 'url'
 import {parse} from 'url'

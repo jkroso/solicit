@@ -1,9 +1,9 @@
 import mimeTypes from 'mime-component/types'
+import Emitter from '@jkroso/emitter'
 import base64 from 'base64-encode'
 import setter from 'setter-method'
 import lazy from 'lazy-property'
 import {Deferred} from 'result'
-import Emitter from 'emitter'
 import join from 'path/join'
 import qs from 'qs'
 
@@ -382,7 +382,7 @@ export default class Request extends Deferred {
    * @return {Request}
    */
 
-  clone = function(){
+  clone() {
     var clone = Object.create(this)
     clone.header = Object.create(this.header)
     clone.options = Object.create(this.options)
