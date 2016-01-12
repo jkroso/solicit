@@ -394,7 +394,10 @@ export default class Request extends Deferred {
  * mixin Emitter
  */
 
-Emitter(Request.prototype)
+Request.prototype.on = Emitter.prototype.on
+Request.prototype.off = Emitter.prototype.off
+Request.prototype.once = Emitter.prototype.once
+Request.prototype.emit = Emitter.prototype.emit
 
 /**
  * Get/Set max redirects
