@@ -1,6 +1,6 @@
 {
   "name": "solicit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a declarative http client for node and browser",
   "repository": "git://github.com/jkroso/solicit.git",
   "dependencies": {
@@ -11,7 +11,7 @@
     "@jkroso/emitter": "1",
     "setter-method": "0",
     "lazy-property": "0",
-    "@jkroso/type": "1",
+    "@jkroso/type": "2",
     "parse-mime": "0",
     "result": "2",
     "qs": "6"
